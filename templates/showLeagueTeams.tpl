@@ -1,4 +1,3 @@
-{$prueba}
 <center>
 <h1>{$titulo}</h1>
 

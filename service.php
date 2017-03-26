@@ -171,7 +171,6 @@ class Futbol extends Service{
 		}
 		// create a json object to send to the template
 		$responseContent = array(
-			"prueba" => $prueba,
 			"titulo" => $textoAsunto,
 			"liga" => $soccerseason,
 			"equipo" => $equipo,
