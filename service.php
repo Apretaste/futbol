@@ -122,6 +122,11 @@ class Futbol extends Service{
 		$idLiga = $datos[0];
 		$equipo = $datos[1];
 		$soccerseason = $apiFD->getSoccerseasonById($idLiga);
+		$equipos = null;
+		$fixturesHome = null;
+		$fixturesAway = null;
+		$players = null;
+		$imgTeamCacheFile = null;
 
 		if (strtoupper($equipo) == "TODOS"){
 			$equipos = $soccerseason->getTeams();
@@ -164,7 +169,8 @@ class Futbol extends Service{
 					$image->annotateImage($dibujo, 10, 45, 0, ' 404!');
 					$image->setImageFormat("png24");
 					$image->resizeImage(1024, 768, imagick::FILTER_LANCZOS, 1); 
-					$image->writeImage($imgTeamCacheFile);
+					$image->writeImage(
+						$imgTeamCacheFile);
 				}
 			}
 			$textoAsunto = "Datos del ".$teamName;
