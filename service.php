@@ -44,7 +44,7 @@ class Futbol extends Service{
 	private function searchJornadaXid($query, $apiFD){
 		$datos = explode(" ", $query);
 		$idLiga = $datos[0];
-		$jornada = $datos[1];
+		$jornada = isset($datos[1]) ? $datos[1] : 1;
 		$soccerseason = $apiFD->getSoccerseasonById($idLiga);
 		if (strtoupper($jornada) == "TODAS"){
 			$fixture = $soccerseason->getAllFixtures();
