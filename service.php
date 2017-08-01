@@ -4,13 +4,14 @@ use Goutte\Client; // UNCOMMENT TO USE THE CRAWLER OR DELETE
 use Symfony\Component\DomCrawler\Crawler;
 include 'models/FootballData.php';
 
-class Futbol extends Service{
+class Futbol extends Service
+{
 	public $apiFD = null;
-	//Get all soccer seasons avaiable
-	public $soccerSeasons = null;
+	public $soccerSeasons = null; //Get all soccer seasons avaiable
+
 	/**
 	 * Function executed when the service is called
-	 * 
+	 *
 	 * @param Request
 	 * @return Response
 	 * */
@@ -18,7 +19,7 @@ class Futbol extends Service{
 		$apiFD = new FootballData();
 		//Get all soccer seasons avaiable
 		$soccerSeasons = $apiFD->getSoccerseasons();
-		if (empty($request->query) || (strtolower($request->query) != 'liga') || (strtolower($request->query) != 'jornada') || (strtolower($request->query) != 'equipo')){                       
+		if (empty($request->query) || (strtolower($request->query) != 'liga') || (strtolower($request->query) != 'jornada') || (strtolower($request->query) != 'equipo')){
 
 			$response = new Response();
 			$response->setResponseSubject("¿Cual liga deseas consultar?");
@@ -27,7 +28,7 @@ class Futbol extends Service{
 		}
 	}
 
-	public function _jornada(Request $request){	
+	public function _jornada(Request $request){
 		$apiFD = new FootballData();
 		//Get all soccer seasons avaiable
 		$soccerSeasons = $apiFD->getSoccerseasons();
@@ -67,7 +68,7 @@ class Futbol extends Service{
 		return $response;
 	}
 
-	public function _liga(Request $request){	
+	public function _liga(Request $request){
 		$apiFD = new FootballData();
 		//Get all soccer seasons avaiable
 		$soccerSeasons = $apiFD->getSoccerseasons();
@@ -80,15 +81,15 @@ class Futbol extends Service{
 			return $this->searchInfoLigaXid($request->query, $apiFD);
 		}
 	}
-	
+
 	private function searchInfoLigaXid($query, $apiFD){
 		$soccerseason = $apiFD->getSoccerseasonById($query);
-        $tableLeague = $soccerseason->getLeagueTable();
-        $tipoTorneo = isset($tableLeague->standing) ? 'liga' : 'copa';
-        $currentMatchday = $soccerseason->payload->currentMatchday;
-        $numberOfMatchdays = $soccerseason->payload->numberOfMatchdays;
-        $nextMatchday = ($currentMatchday < $numberOfMatchdays) ? ($currentMatchday + 1): $numberOfMatchdays;
-        $nextFixture = $soccerseason->getFixturesByMatchday($nextMatchday);
+		$tableLeague = $soccerseason->getLeagueTable();
+		$tipoTorneo = isset($tableLeague->standing) ? 'liga' : 'copa';
+		$currentMatchday = $soccerseason->payload->currentMatchday;
+		$numberOfMatchdays = $soccerseason->payload->numberOfMatchdays;
+		$nextMatchday = ($currentMatchday < $numberOfMatchdays) ? ($currentMatchday + 1): $numberOfMatchdays;
+		$nextFixture = $soccerseason->getFixturesByMatchday($nextMatchday);
 		// create a json object to send to the template
 		$responseContent = array(
 			"tipoTorneo" => $tipoTorneo,
@@ -103,7 +104,7 @@ class Futbol extends Service{
 		return $response;
 	}
 
-	public function _equipo(Request $request){	
+	public function _equipo(Request $request){
 		$apiFD = new FootballData();
 		//Get all soccer seasons avaiable
 		$soccerSeasons = $apiFD->getSoccerseasons();
@@ -134,19 +135,19 @@ class Futbol extends Service{
 		}else{
 			$teamName = substr($query, 4);
 			// search for desired team
-            $searchQuery = $apiFD->searchTeam(urlencode($teamName));
+			$searchQuery = $apiFD->searchTeam(urlencode($teamName));
 
 			$equipos = $apiFD->getTeamById($searchQuery->teams[0]->id);
-            $fixturesHome = $equipos->getFixtures('home')->fixtures;
-            $fixturesAway = $equipos->getFixtures('away')->fixtures;
-            $players = $equipos->getPlayers();
-            $imgTeamSource = $equipos->_payload->crestUrl;
-            $extension = substr($imgTeamSource, -4);
+			$fixturesHome = $equipos->getFixtures('home')->fixtures;
+			$fixturesAway = $equipos->getFixtures('away')->fixtures;
+			$players = $equipos->getPlayers();
+			$imgTeamSource = $equipos->_payload->crestUrl;
+			$extension = substr($imgTeamSource, -4);
 
-            $di = \Phalcon\DI\FactoryDefault::getDefault();
-        	$wwwroot = $di->get('path')['root'];
-        	$imgTeamCacheFile = "$wwwroot/temp/" . "team_".$idLiga."_".$searchQuery->teams[0]->id."_logoCacheFile.png"; //
-        	
+			$di = \Phalcon\DI\FactoryDefault::getDefault();
+			$wwwroot = $di->get('path')['root'];
+			$imgTeamCacheFile = "$wwwroot/temp/" . "team_".$idLiga."_".$searchQuery->teams[0]->id."_logoCacheFile.png"; //
+
 			if(!file_exists($imgTeamCacheFile)){
 				$imgTeamSource = $this->file_get_contents_curl($imgTeamSource);
 				if ($imgTeamSource != false){
@@ -154,7 +155,7 @@ class Futbol extends Service{
 						$image = new Imagick();
 						$image->readImageBlob($imgTeamSource); //imagen svg
 						$image->setImageFormat("png24");
-						$image->resizeImage(1024, 768, imagick::FILTER_LANCZOS, 1); 
+						$image->resizeImage(1024, 768, imagick::FILTER_LANCZOS, 1);
 						$image->writeImage($imgTeamCacheFile); //imagen png
 					}else{
 						file_put_contents($imgTeamCacheFile, $imgTeamSource);
@@ -163,12 +164,12 @@ class Futbol extends Service{
 					$image = new Imagick();
 					$dibujo = new ImagickDraw();
 					$dibujo->setFontSize( 30 );
-					
+
 					$image->newImage(100, 100, new ImagickPixel('#d3d3d3')); //imagen fondo gris
 					/* Crear texto */
 					$image->annotateImage($dibujo, 10, 45, 0, ' 404!');
 					$image->setImageFormat("png24");
-					$image->resizeImage(1024, 768, imagick::FILTER_LANCZOS, 1); 
+					$image->resizeImage(1024, 768, imagick::FILTER_LANCZOS, 1);
 					$image->writeImage(
 						$imgTeamCacheFile);
 				}
@@ -199,20 +200,20 @@ class Futbol extends Service{
 
 	private function file_get_contents_curl($url){
 		$ch = curl_init();
-      	curl_setopt($ch, CURLOPT_HEADER, 0);
-      	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); //Set curl to return the data instead of printing it to the browser.
-	  	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-	  	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-	  	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-      	curl_setopt($ch, CURLOPT_URL, $url);
-      	$data = curl_exec($ch);
-      	/* Check for 404 (file not found). */
+		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); //Set curl to return the data instead of printing it to the browser.
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+		curl_setopt($ch, CURLOPT_URL, $url);
+		$data = curl_exec($ch);
+		/* Check for 404 (file not found). */
 		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		if($httpCode == 404) {
-		    /* Handle 404 here. */
-		    $data = false;
+			/* Handle 404 here. */
+			$data = false;
 		}
-	    curl_close($ch);
-	    return $data;
-    }
+		curl_close($ch);
+		return $data;
+	}
 }

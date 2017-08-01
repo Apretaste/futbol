@@ -4,9 +4,8 @@
 		<alias>football</alias>
 		<alias>soccer</alias>
 	</serviceAliases>
-	<serviceDescription>Consulta y muestra resultados de algunos torneos importantes de futbol.</serviceDescription>
+	<serviceDescription>Consulta y muestra resultados de algunos torneos importantes de futbol</serviceDescription>
 	<creatorEmail>jaikerkings@yahoo.es</creatorEmail>
-	<!--serviceCategory: negocios,ocio,academico,social,comunicaciones,informativo,adulto,otros-->
 	<serviceCategory>ocio</serviceCategory>
 	<serviceUsage>
 		<![CDATA[
