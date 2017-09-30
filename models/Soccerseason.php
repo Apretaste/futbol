@@ -79,7 +79,7 @@ class Soccerseason {
         
         $response = json_decode($response);
         
-        return $response->fixtures;
+        return (is_object($response)) ? $response->fixtures : [];
     }
     
     /**
