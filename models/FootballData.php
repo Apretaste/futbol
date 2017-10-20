@@ -1,204 +1,5 @@
 <?php
 
-include 'Soccerseason.php';
-include 'Team.php';
-
-/**
- * This service class encapsulates football-data.org's RESTful API.
- *
- * @author Daniel Freitag <daniel@football-data.org>
- * @date 04.11.2015
- *
- */
-class FootballData
-{
-	public $config;
-	public $baseUri;
-	public $reqPrefs = array();
-
-	public function __construct() {
-		$this->config = parse_ini_file('config.ini', true);
-
-	// some lame hint for the impatient
-	if($this->config['authToken'] == 'YOUR_AUTH_TOKEN' || !isset($this->config['authToken'])) {
-		exit('Get your API-Key first and edit config.ini');
-	}
-
-		$this->baseUri = $this->config['baseUri'];
-
-		$this->reqPrefs['http']['method'] = 'GET';
-		$this->reqPrefs['http']['header'] = 'X-Auth-Token: ' . $this->config['authToken'];
-	}
-
-	/**
-	 * Function returns all soccer season avaiable in the api.
-	 *
-	 * @return \ array of Soccerseasons avaiable
-	 */
-	public function getSoccerseasons() {
-		$uri = $this->baseUri . 'soccerseasons/';
-		// load from cache if exists
-		$nomCacheFile = preg_replace('/[\.\/:?=&\']/', '_', $uri);
-		$di = \Phalcon\DI\FactoryDefault::getDefault();
-		$wwwroot = $di->get('path')['root'];
-
-		$cacheFile = "$wwwroot/temp/" . date("Y") . "_".$nomCacheFile."_cacheFile.tmp";
-		//$cacheFile = $this->utils->getTempDir() . date("Y") . "_".$nomCacheFile."_cacheFile.tmp";
-
-		if(file_exists($cacheFile)){
-			$response = file_get_contents($cacheFile);
-		}else{
-			$response = file_get_contents($uri, false, stream_context_create($this->reqPrefs));
-			// save cache file
-			file_put_contents($cacheFile, $response);
-		}
-
-		$result = json_decode($response);
-
-		return $result;//new Soccerseason($result);
-	}
-
-	/**
-	 * Function returns a specific soccer season identified by an id.
-	 *
-	 * @param Integer $id
-	 * @return \Soccerseason object
-	 */
-	public function getSoccerseasonById($id) {
-		$uri = $this->baseUri . 'soccerseasons/' . $id;
-		// load from cache if exists
-		$nomCacheFile = preg_replace('/[\.\/:?=&\']/', '_', $uri);
-		$di = \Phalcon\DI\FactoryDefault::getDefault();
-		$wwwroot = $di->get('path')['root'];
-
-		$cacheFile = "$wwwroot/temp/" . date("Ymd") . "_".$nomCacheFile."_cacheFile.tmp";
-		//$cacheFile = $this->utils->getTempDir() . date("Ymd") . "_".$nomCacheFile."_cacheFile.tmp";
-
-		if(file_exists($cacheFile)){
-			$response = file_get_contents($cacheFile);
-		}else{
-			$response = file_get_contents($uri, false, stream_context_create($this->reqPrefs));
-			// save cache file
-			file_put_contents($cacheFile, $response);
-		}
-
-		$result = json_decode($response);
-
-		return new Soccerseason($result);
-	}
-
-	/**
-	 * Function returns all available fixtures for a given date range.
-	 *
-	 * @param DateString 'Y-m-d' $start
-	 * @param DateString 'Y-m-d' $end
-	 * @return array of fixture objects
-	 */
-	public function getFixturesForDateRange($start, $end) {
-		$uri = $this->baseUri . 'fixtures/?timeFrameStart=' . $start . '&timeFrameEnd=' . $end;
-		// load from cache if exists
-		$nomCacheFile = preg_replace('/[\.\/:?=&\']/', '_', $uri);
-		$di = \Phalcon\DI\FactoryDefault::getDefault();
-		$wwwroot = $di->get('path')['root'];
-
-		$cacheFile = "$wwwroot/temp/" . date("YmdG") . "_".$nomCacheFile."_cacheFile.tmp";
-		//$cacheFile = $this->utils->getTempDir() . date("YmdG") . "_".$nomCacheFile."_cacheFile.tmp";
-
-		if(file_exists($cacheFile)){
-			$response = file_get_contents($cacheFile);
-		}else{
-			$response = file_get_contents($uri, false, stream_context_create($this->reqPrefs));
-			// save cache file
-			file_put_contents($cacheFile, $response);
-		}
-
-		return json_decode($response);
-	}
-
-	/**
-	 * Function returns one unique fixture identified by a given id.
-	 *
-	 * @param int $id
-	 * @return stdObject fixture
-	 */
-	public function getFixtureById($id) {
-		$uri = $this->baseUri . 'fixtures/' . $id;
-		// load from cache if exists
-		$nomCacheFile = preg_replace('/[\.\/:?=&\']/', '_', $uri);
-		$di = \Phalcon\DI\FactoryDefault::getDefault();
-		$wwwroot = $di->get('path')['root'];
-
-		$cacheFile = "$wwwroot/temp/" . date("YmdG") . "_".$nomCacheFile."_cacheFile.tmp";
-		//$cacheFile = $this->utils->getTempDir() . date("YmdG") . "_".$nomCacheFile."_cacheFile.tmp";
-
-		if(file_exists($cacheFile)){
-			$response = file_get_contents($cacheFile);
-		}else{
-			$response = file_get_contents($uri, false, stream_context_create($this->reqPrefs));
-			// save cache file
-			file_put_contents($cacheFile, $response);
-		}
-
-		return json_decode($response);
-	}
-
-	/**
-	 * Function returns one unique team identified by a given id.
-	 *
-	 * @param int $id
-	 * @return stdObject team
-	 */
-	public function getTeamById($id) {
-		$uri = $this->baseUri . 'teams/' . $id;
-		// load from cache if exists
-		$nomCacheFile = preg_replace('/[\.\/:?=&\']/', '_', $uri);
-		$di = \Phalcon\DI\FactoryDefault::getDefault();
-		$wwwroot = $di->get('path')['root'];
-
-		$cacheFile = "$wwwroot/temp/" . date("Ym") . "_".$nomCacheFile."_cacheFile.tmp";
-		//$cacheFile = $this->utils->getTempDir() . date("Ym") . "_".$nomCacheFile."_cacheFile.tmp";
-
-		if(file_exists($cacheFile)){
-			$response = file_get_contents($cacheFile);
-		}else{
-			$response = file_get_contents($uri, false, stream_context_create($this->reqPrefs));
-			// save cache file
-			file_put_contents($cacheFile, $response);
-		}
-
-		$result = json_decode($response);
-
-		return new Team($result);
-	}
-
-	/**
-	 * Function returns all teams matching a given keyword.
-	 *
-	 * @param string $keyword
-	 * @return list of team objects
-	 */
-	public function searchTeam($keyword) {
-		$uri = $this->baseUri . 'teams/?name=' . $keyword;
-		// load from cache if exists
-		$nomCacheFile = preg_replace('/[\.\/:?=&\']/', '_', $uri);
-		$di = \Phalcon\DI\FactoryDefault::getDefault();
-		$wwwroot = $di->get('path')['root'];
-
-		$cacheFile = "$wwwroot/temp/" . date("Ym") . "_".$nomCacheFile."_cacheFile.tmp";
-		//$cacheFile = $this->utils->getTempDir() . date("Ym") . "_".$nomCacheFile."_cacheFile.tmp";
-
-		if(file_exists($cacheFile)){
-			$response = file_get_contents($cacheFile);
-		}else{
-			$response = file_get_contents($uri, false, stream_context_create($this->reqPrefs));
-			// save cache file
-			file_put_contents($cacheFile, $response);
-		}
-
-		return json_decode($response);
-	}
-}
-
 /*
 Estructura del objecto season:
 stdClass Object (
@@ -259,3 +60,185 @@ stdClass Object (
 			)
 )
 */
+include 'Soccerseason.php';
+include 'Team.php';
+
+/**
+ * This service class encapsulates football-data.org's RESTful API.
+ *
+ * @author  Daniel Freitag <daniel@football-data.org>
+ * @author  Kuma [@kumahacker] <kumahavana@gmail.com>
+ * @version 2.0
+ * @date    19.10.2017
+ */
+class FootballData
+{
+	public $config;
+	public $baseUri;
+	public $req_preferences = [];
+
+	public function __construct()
+	{
+		$this->config = parse_ini_file('config.ini', true);
+
+		// some lame hint for the impatient
+		if($this->config['authToken'] == 'YOUR_AUTH_TOKEN' || ! isset($this->config['authToken']))
+		{
+			exit('Get your API-Key first and edit config.ini');
+		}
+
+		$this->baseUri = $this->config['baseUri'];
+
+		$this->req_preferences['http']['method'] = 'GET';
+		$this->req_preferences['http']['header'] = 'X-Auth-Token: ' . $this->config['authToken'];
+	}
+
+	/**
+	 * Get remote contents with cURL
+	 *
+	 * @param $url
+	 *
+	 * @return bool|mixed
+	 */
+	private function file_get_contents_curl($url)
+	{
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_HEADER, false);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, [
+			$this->req_preferences['http']['header']
+		]);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); //Set curl to return the data instead of printing it to the browser.
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+		curl_setopt($ch, CURLOPT_URL, $url);
+		$data = curl_exec($ch);
+		/* Check for 404 (file not found). */
+		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		if($httpCode == 404)
+		{
+			/* Handle 404 here. */
+			$data = false;
+		}
+		curl_close($ch);
+
+		return $data;
+	}
+
+	/**
+	 * Generic method for get remote content
+	 *
+	 * @param        $uri
+	 * @param string $date
+	 *
+	 * @return mixed
+	 */
+	public function getRemoteContent($uri, $date = null)
+	{
+		if(is_null($date)) $date = date("YmdG");
+
+		// load from cache if exists
+		$nomCacheFile = preg_replace('/[\.\/:?=&\']/', '_', $uri);
+		$di           = \Phalcon\DI\FactoryDefault::getDefault();
+		$www_root     = $di->get('path')['root'];
+
+		$cacheFile = "$www_root/temp/{$date}_{$nomCacheFile}_cacheFile.tmp";
+
+		if(file_exists($cacheFile)) $response = file_get_contents($cacheFile);
+		else
+		{
+			$response = $this->file_get_contents_curl($uri);
+
+			// save cache file
+			file_put_contents($cacheFile, $response);
+		}
+
+		return json_decode($response);
+	}
+
+	/**
+	 * Function returns all soccer season avaiable in the api.
+	 *
+	 * @return \ array of Soccerseasons avaiable
+	 */
+	public function getSoccerseasons()
+	{
+		$uri    = $this->baseUri . 'soccerseasons/';
+		$result = $this->getRemoteContent($uri, date("Y"));
+
+		return $result; //new Soccerseason($result);
+	}
+
+	/**
+	 * Function returns a specific soccer season identified by an id.
+	 *
+	 * @param Integer $id
+	 *
+	 * @return \Soccerseason object
+	 */
+	public function getSoccerseasonById($id)
+	{
+		$uri    = $this->baseUri . 'soccerseasons/' . $id;
+		$result = $this->getRemoteContent($uri, date("Ymd"));
+
+		return new Soccerseason($result);
+	}
+
+	/**
+	 * Function returns all available fixtures for a given date range.
+	 *
+	 * @param DateString 'Y-m-d' $start
+	 * @param DateString 'Y-m-d' $end
+	 *
+	 * @return array of fixture objects
+	 */
+	public function getFixturesForDateRange($start, $end)
+	{
+		$uri = $this->baseUri . 'fixtures/?timeFrameStart=' . $start . '&timeFrameEnd=' . $end;
+
+		return $this->getRemoteContent($uri);
+	}
+
+	/**
+	 * Function returns one unique fixture identified by a given id.
+	 *
+	 * @param int $id
+	 *
+	 * @return object fixture
+	 */
+	public function getFixtureById($id)
+	{
+		$uri = $this->baseUri . 'fixtures/' . $id;
+
+		return $this->getRemoteContent($uri);
+	}
+
+	/**
+	 * Function returns one unique team identified by a given id.
+	 *
+	 * @param int $id
+	 *
+	 * @return object team
+	 */
+	public function getTeamById($id)
+	{
+		$uri    = $this->baseUri . 'teams/' . $id;
+		$result = $this->getRemoteContent($uri, date("Ym"));
+		return new Team($result);
+	}
+
+	/**
+	 * Function returns all teams matching a given keyword.
+	 *
+	 * @param string $keyword
+	 *
+	 * @return array
+	 */
+	public function searchTeam($keyword)
+	{
+		$uri = $this->baseUri . 'teams/?name=' . $keyword;
+
+		return $this->getRemoteContent($uri, date("Ym"));
+	}
+}
+
