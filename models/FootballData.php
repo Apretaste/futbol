@@ -181,6 +181,8 @@ class FootballData
 		$uri    = $this->baseUri . 'soccerseasons/' . $id;
 		$result = $this->getRemoteContent($uri, date("Ymd"));
 
+		if( ! isset($result->caption)) return null;
+
 		return new Soccerseason($result);
 	}
 
@@ -224,6 +226,7 @@ class FootballData
 	{
 		$uri    = $this->baseUri . 'teams/' . $id;
 		$result = $this->getRemoteContent($uri, date("Ym"));
+
 		return new Team($result);
 	}
 

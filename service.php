@@ -115,6 +115,15 @@ class Futbol extends Service
 	private function searchInfoLeagueById($query, $apiFD)
 	{
 		$soccerseason      = $apiFD->getSoccerseasonById($query);
+
+		if (is_null($soccerseason))
+		{
+			$response = new Response();
+			$response->setResponseSubject("No encontramos informacion de la liga en estos momentos.");
+			$response->createFromText("No encontramos informaci&oacute;n de la liga en estos momentos. Por favor intente m&aacute;s tarde.");
+			return $response;
+		}
+
 		$tableLeague       = $soccerseason->getLeagueTable();
 		$tipoTorneo        = isset($tableLeague->standing) ? 'liga' : 'copa';
 		$currentMatchday   = $soccerseason->payload->currentMatchday;
