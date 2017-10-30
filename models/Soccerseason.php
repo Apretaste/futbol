@@ -23,7 +23,7 @@ class Soccerseason
 	 */
 	public function __construct($payload)
 	{
-		$payload->caption                        = preg_replace('/Primera Division/', 'LaLiga | LFP de España', $payload->caption);
+		$payload->caption = preg_replace('/Primera Division/', 'LaLiga | LFP de España', $payload->caption);
 		$this->payload                           = $payload;
 		$config                                  = parse_ini_file('config.ini', true);
 		$this->req_preferences['http']['method'] = 'GET';

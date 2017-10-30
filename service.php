@@ -53,6 +53,15 @@ class Futbol extends Service
 		$journey       = isset($query_data[1]) ? $query_data[1] : 1;
 		$soccer_season = $apiFD->getSoccerseasonById($id_league);
 
+		if(is_null($soccer_season))
+		{
+			$response = new Response();
+			$response->setResponseSubject("No encontramos informacion de la liga en estos momentos.");
+			$response->createFromText("No encontramos informaci&oacute;n de la liga en estos momentos. Por favor intente m&aacute;s tarde.");
+
+			return $response;
+		}
+
 		if(strtoupper($journey) == "TODAS")
 		{
 			$fixture          = $soccer_season->getAllFixtures();
@@ -90,6 +99,7 @@ class Futbol extends Service
 
 		// Get all soccer seasons available
 		$soccerSeasons = $apiFD->getSoccerseasons();
+
 		if(empty($request->query))
 		{
 			$response = new Response();
@@ -114,13 +124,14 @@ class Futbol extends Service
 	 */
 	private function searchInfoLeagueById($query, $apiFD)
 	{
-		$soccerseason      = $apiFD->getSoccerseasonById($query);
+		$soccerseason = $apiFD->getSoccerseasonById($query);
 
-		if (is_null($soccerseason))
+		if(is_null($soccerseason))
 		{
 			$response = new Response();
 			$response->setResponseSubject("No encontramos informacion de la liga en estos momentos.");
 			$response->createFromText("No encontramos informaci&oacute;n de la liga en estos momentos. Por favor intente m&aacute;s tarde.");
+
 			return $response;
 		}
 
@@ -212,6 +223,16 @@ class Futbol extends Service
 		$id_league        = $query_data[0];
 		$equipo           = $query_data[1];
 		$soccer_season    = $apiFD->getSoccerseasonById($id_league);
+
+		if(is_null($soccer_season))
+		{
+			$response = new Response();
+			$response->setResponseSubject("No encontramos informacion de la liga en estos momentos.");
+			$response->createFromText("No encontramos informaci&oacute;n de la liga en estos momentos. Por favor intente m&aacute;s tarde.");
+
+			return $response;
+		}
+
 		$equipos          = null;
 		$fixturesHome     = null;
 		$fixturesAway     = null;
@@ -238,7 +259,7 @@ class Futbol extends Service
 				return $response;
 			}
 
-			$equipos       = $apiFD->getTeamById($searchQuery->teams[0]->id);
+			$equipos = $apiFD->getTeamById($searchQuery->teams[0]->id);
 
 			$fixturesHome  = $equipos->getFixtures('home')->fixtures;
 			$fixturesAway  = $equipos->getFixtures('away')->fixtures;
