@@ -8,14 +8,8 @@
  * @version 2.0
  * @date    19.10.2017
  */
-class Team
+class Team extends FutbolCommon
 {
-
-	public $config;
-	public $req_preferences = [];
-
-	public $_payload;
-
 	/**
 	 * An object is instantiated with the payload of a request to a team resource.
 	 *
@@ -106,7 +100,6 @@ class Team
 	 */
 	public function getFixtures($venue = "", $timeFrame = "")
 	{
-		var_dump($this->_payload->_links->fixtures);
 
 		if (!isset($this->_payload->_links->fixtures->href))
 			return false;
