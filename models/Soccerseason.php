@@ -35,17 +35,16 @@ class Soccerseason extends FutbolCommon
 	 */
 	public function getAllFixtures()
 	{
-		$uri      = "http://api.football-data.org/v2/competitions/".$this->payload->id."/matches";
+		$uri= "http://api.football-data.org/v2/competitions/".$this->payload->id."/matches?status=FINISHED";
 		$content = $this->getRemoteContent($uri);
-		var_dump($uri);
-		if (!isset($content->fixtures))
+		if (!isset($content->matches))
 		{
 			$utils = new Utils();
 			$utils->createAlert("[Futbol] Unknown content from $uri: ".json_encode($content));
 			return [];
 		}
 
-		return $content->fixtures;
+		return $content->matches;
 	}
 
 	/**

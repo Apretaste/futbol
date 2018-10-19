@@ -29,9 +29,9 @@
 	</table>
 {else}
 	<table style="text-align:center" width="100%">
-	    <!--<tr>
+	    <tr>
 	        <th colspan="2">{img src="{$imgTeam}" alt="TeamLogo" width="100px" height="130px"}</th>
-	    </tr>-->
+	    </tr>
 	    <!--<tr>
 	        <td colspan="2"><h2><b>{$equipos->_payload->name}</b></h2></td>
 	    </tr>-->

@@ -65,7 +65,6 @@ class Futbol extends Service
 		if(strtoupper($journey) == "TODAS")
 		{
 			$fixture          = $soccer_season->getAllFixtures();
-			var_dump($fixture);
 			$response_subject = "Todos los resultados de la " . $soccer_season->payload->name;
 		}
 		else
@@ -265,32 +264,36 @@ class Futbol extends Service
 			$fixturesHome  = $equipos->getFixtures('HOME')->matches;
 			$fixturesAway  = $equipos->getFixtures('AWAY')->matches;
 			//$players       = $equipos->getPlayers();
+
 			$imgTeamSource = $equipos->_payload->crestUrl;
 			$extension     = substr($imgTeamSource, - 4);
 
 			$di               = \Phalcon\DI\FactoryDefault::getDefault();
 			$wwwroot          = $di->get('path')['root'];
-			$imgTeamCacheFile = "$wwwroot/temp/" . "team_" . $id_league . "_".$equipo."_logoCacheFile.png"; 
+			$imgTeamCacheFile = "$wwwroot/temp/" . "team_" . $id_league . "_".$equipo."_logoCacheFile.svg"; 
 
-			/*if( ! file_exists($imgTeamCacheFile))
+			if( ! file_exists($imgTeamCacheFile))
 			{
+
 				$imgTeamSource = $this->file_get_contents_curl($imgTeamSource);
 				if($imgTeamSource != false)
 				{
 					if(strtolower($extension) == '.svg')
 					{
-						$image = new Imagick();
+						file_put_contents($imgTeamCacheFile, $imgTeamSource);
+						/*$image = new Imagick();
 						$image->readImageBlob($imgTeamSource); //imagen svg
 						$image->setImageFormat("png24");
 						$image->resizeImage(1024, 768, imagick::FILTER_LANCZOS, 1);
-						$image->writeImage($imgTeamCacheFile); //imagen png
+						$image->writeImage($imgTeamCacheFile); //imagen png*/
 					}
 					else
 					{
 						file_put_contents($imgTeamCacheFile, $imgTeamSource);
 					}
 				}
-				else
+
+				/*else
 				{
 					$image  = new Imagick();
 					$dibujo = new ImagickDraw();
@@ -301,8 +304,8 @@ class Futbol extends Service
 					$image->setImageFormat("png24");
 					$image->resizeImage(1024, 768, imagick::FILTER_LANCZOS, 1);
 					$image->writeImage($imgTeamCacheFile);
-				}
-			}*/
+				}*/
+			}
 			$textoAsunto = "Datos del " . $equipos->_payload->name;
 		}
 
@@ -315,7 +318,7 @@ class Futbol extends Service
 			"juegosHome" => $fixturesHome,
 			"juegosAway" => $fixturesAway,
 			"jugadores" => $players,
-			//"imgTeam" => $imgTeamCacheFile
+			"imgTeam" => $imgTeamCacheFile
 		];
 
 		// get the images to embed into the email
@@ -333,9 +336,12 @@ class Futbol extends Service
 
 	private function file_get_contents_curl($url)
 	{
+
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_HEADER, 0);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); //Set curl to return the data instead of printing it to the browser.
+		curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Auth-Token:b8044b406aca4851ac7ceeea79fccaea"
+		]);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
