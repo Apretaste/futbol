@@ -23,9 +23,9 @@ class Soccerseason extends FutbolCommon
 	{
 		$payload->name = preg_replace('/Primera Division/', 'LaLiga | LFP de España', $payload->name);
 		$this->payload                           = $payload;
-		$config                                  = parse_ini_file('config.ini', true);
+		$this->config                                  = parse_ini_file('config.ini', true);
 		$this->req_preferences['http']['method'] = 'GET';
-		$this->req_preferences['http']['header'] = 'X-Auth-Token: ' . $config['authToken'];
+		$this->req_preferences['http']['header'] = 'X-Auth-Token: ' . $this->config['authToken'];
 	}
 
 	/**
@@ -35,7 +35,8 @@ class Soccerseason extends FutbolCommon
 	 */
 	public function getAllFixtures()
 	{
-		$uri= "http://api.football-data.org/v2/competitions/".$this->payload->id."/matches?status=FINISHED";
+		var_dump($this->config["baseUri"]);
+		$uri= $this->config["baseUri"]."competitions/".$this->payload->id."/matches?status=FINISHED";
 		$content = $this->getRemoteContent($uri);
 		if (!isset($content->matches))
 		{
@@ -56,7 +57,7 @@ class Soccerseason extends FutbolCommon
 	 */
 	public function getFixturesByMatchDay($match_day = 1)
 	{
-		$uri      = "http://api.football-data.org/v2/competitions/".$this->payload->id."/matches?matchday=" . $match_day;
+		$uri    = $this->config["baseUri"]."competitions/".$this->payload->id."/matches?matchday=" . $match_day;
 		$response = $this->getRemoteContent($uri);
 		return (is_object($response)) ? $response->matches : [];
 	}
@@ -68,7 +69,7 @@ class Soccerseason extends FutbolCommon
 	 */
 	public function getTeams()
 	{
-		$uri= "http://api.football-data.org/v2/competitions/".$this->payload->id."/teams";
+		$uri= $this->config["baseUri"]."competitions/".$this->payload->id."/teams";
 
 		return $this->getRemoteContent($uri)->teams;
 	}
