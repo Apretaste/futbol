@@ -60,9 +60,10 @@
 	</table>
 {else}
 	{foreach $posicionesLiga->standings as $group}
+        {if $group->type=="TOTAL"}
      	<table style="text-align:center" width="100%">
          	<tr>
-                <th colspan="8">Grupo {$group[0]->group}</th>
+                <th colspan="8">{$group->group}</th>
             </tr>
             <tr>
                 <th><h2>#</h2></th>
@@ -73,18 +74,19 @@
                 <th><h2>GC</h2></th>
                 <th><h2>Dif</h2></th>
             </tr>
-        {foreach $group as $team} 
+        {foreach $group->table as $team} 
             <tr>
-                <td>{$team->rank}</td>
-                <td>{link href="FUTBOL EQUIPO {$liga->payload->id} {$team->team}" caption="{$team->team}"}</td>
+                <td>{$team->position}</td>
+                <td>{link href="FUTBOL EQUIPO {$liga->payload->id} {$team->team->id}" caption="{$team->team->name}"}</td>
                 <td>{$team->playedGames}</td>
                 <td>{$team->points}</td>
-                <td>{$team->goals}</td>
+                <td>{$team->goalsFor}</td>
                 <td>{$team->goalsAgainst}</td>
                 <td>{$team->goalDifference}</td>
             </tr>
         {/foreach}
     	</table>
+        {/if}
 	{/foreach}
 {/if}
 {space5}

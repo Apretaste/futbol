@@ -35,7 +35,6 @@ class Soccerseason extends FutbolCommon
 	 */
 	public function getAllFixtures()
 	{
-		var_dump($this->config["baseUri"]);
 		$uri= $this->config["baseUri"]."competitions/".$this->payload->id."/matches?status=FINISHED";
 		$content = $this->getRemoteContent($uri);
 		if (!isset($content->matches))

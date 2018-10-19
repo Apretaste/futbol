@@ -65,6 +65,7 @@ class Futbol extends Service
 		if(strtoupper($journey) == "TODAS")
 		{
 			$fixture          = $soccer_season->getAllFixtures();
+			
 			$response_subject = "Todos los resultados de la " . $soccer_season->payload->name;
 		}
 		else
@@ -136,7 +137,7 @@ class Futbol extends Service
 		}
 
 		$tableLeague       = $soccerseason->getLeagueTable();
-		$tipoTorneo        = isset($tableLeague->standings) ? 'liga' : 'copa';
+		$tipoTorneo        = ($tableLeague->standings[0]->stage=="GROUP_STAGE") ? 'copa' : 'liga';
 		$currentMatchday   = $soccerseason->payload->currentSeason->currentMatchday;
 		//$numberOfMatchdays = $soccerseason->payload->numberOfMatchdays;
 		//$nextMatchday      = ($currentMatchday < $numberOfMatchdays) ? ($currentMatchday + 1) : $numberOfMatchdays;
