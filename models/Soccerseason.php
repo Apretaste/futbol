@@ -21,7 +21,7 @@ class Soccerseason extends FutbolCommon
 	 */
 	public function __construct($payload)
 	{
-		$payload->caption = preg_replace('/Primera Division/', 'LaLiga | LFP de España', $payload->caption);
+		$payload->name = preg_replace('/Primera Division/', 'LaLiga | LFP de España', $payload->name);
 		$this->payload                           = $payload;
 		$config                                  = parse_ini_file('config.ini', true);
 		$this->req_preferences['http']['method'] = 'GET';
@@ -35,10 +35,9 @@ class Soccerseason extends FutbolCommon
 	 */
 	public function getAllFixtures()
 	{
-		$uri = $this->payload->_links->fixtures->href;
-
+		$uri      = "http://api.football-data.org/v2/competitions/".$this->payload->id."/matches";
 		$content = $this->getRemoteContent($uri);
-
+		var_dump($uri);
 		if (!isset($content->fixtures))
 		{
 			$utils = new Utils();
@@ -58,10 +57,9 @@ class Soccerseason extends FutbolCommon
 	 */
 	public function getFixturesByMatchDay($match_day = 1)
 	{
-		$uri      = $this->payload->_links->fixtures->href . '/?matchday=' . $match_day;
+		$uri      = "http://api.football-data.org/v2/competitions/".$this->payload->id."/matches?matchday=" . $match_day;
 		$response = $this->getRemoteContent($uri);
-
-		return (is_object($response)) ? $response->fixtures : [];
+		return (is_object($response)) ? $response->matches : [];
 	}
 
 	/**
@@ -71,7 +69,7 @@ class Soccerseason extends FutbolCommon
 	 */
 	public function getTeams()
 	{
-		$uri = $this->payload->_links->teams->href;
+		$uri= "http://api.football-data.org/v2/competitions/".$this->payload->id."/teams";
 
 		return $this->getRemoteContent($uri)->teams;
 	}
@@ -83,10 +81,9 @@ class Soccerseason extends FutbolCommon
 	 */
 	public function getLeagueTable()
 	{
-		$uri = $this->payload->_links->leagueTable->href;
-
-		return $this->getRemoteContent($uri);
+		//$uri = $this->payload->_links->leagueTable->href;
+		
+		return $this->getRemoteContent("http://api.football-data.org/v2/competitions/".$this->payload->id."/standings");
 	}
-
 
 }

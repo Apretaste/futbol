@@ -1,5 +1,5 @@
 <center>
-<h1>{$liga->payload->caption}</h1>
+<h1>{$liga->payload->name}</h1>
 {space5}
 <h2>Posiciones</h2>
 {space10}
@@ -17,16 +17,16 @@
             <th><h2>GC</h2></th>
             <th><h2>Dif</h2></th>
         </tr>
-        {foreach $posicionesLiga->standing as $position}
+        {foreach $posicionesLiga->standings[0]->table as $position}
             <tr>
                 <td>{$position->position}</td>
-                <td>{link href="FUTBOL EQUIPO {$liga->payload->id} {$position->teamName}" caption="{$position->teamName}"}</td>
+                <td>{link href="FUTBOL EQUIPO {$liga->payload->id} {$position->team->id}" caption="{$position->team->name}"}</td>
                 <td>{$position->points}</td>
                 <td>{$position->playedGames}</td>
-                <td>{$position->wins}</td>
-                <td>{$position->draws}</td>
-                <td>{$position->losses}</td>
-                <td>{$position->goals}</td>
+                <td>{$position->won}</td>
+                <td>{$position->draw}</td>
+                <td>{$position->lost}</td>
+                <td>{$position->goalsFor}</td>
                 <td>{$position->goalsAgainst}</td>
                 <td>{$position->goalDifference}</td>
             </tr>
@@ -45,18 +45,18 @@
 	    {foreach $nextFixture as $juego}
 		    {strip}
 		    <tr>
-		        <td>{$juego->homeTeamName}</td>
+		        <td>{$juego->homeTeam->name}</td>
 		        <td>Vs.</td>
-		        <td>{$juego->awayTeamName}</td>
-				<td>{$juego->date|date_format:"%d/%m/%Y %H:%M"}</td>
+		        <td>{$juego->awayTeam->name}</td>
+				<td>{$juego->utcDate|date_format:"%d/%m/%Y %H:%M"}</td>
 		    </tr>
 		    {/strip}
 	    {/foreach}
-	    {if $liga->payload->currentMatchday >= $liga->payload->numberOfMatchdays}
+	    {*if $liga->payload->currentSeason->currentMatchday >= $liga->payload->numberOfMatchdays}
 	    <tr>
 		    <td colspan="4"><h2><p>&Eacute;sta fue la &uacute;ltima jornada de &eacute;sta temporada.</p>Nos vemos en la pr&oacute;xima temporada!</h2></td>
 		</tr>
-	    {/if}
+	    {/if*}
 	</table>
 {else}
 	{foreach $posicionesLiga->standings as $group}
@@ -88,13 +88,13 @@
 	{/foreach}
 {/if}
 {space5}
-<p>Posiciones en la jornada {$liga->payload->currentMatchday} de {$liga->payload->numberOfMatchdays}.</p>
+<!--<p>Posiciones en la jornada {$liga->payload->currentMatchday} de {$liga->payload->numberOfMatchdays}.</p>-->
 
 {space15}
 <table style="text-align:center;" width="100%">
 	<tr>
 		<td style="" colspan="1">
-	      	{button href="FUTBOL JORNADA {$liga->payload->id} {$liga->payload->currentMatchday}" caption="Jornada Actual" color="green"}
+	      	{button href="FUTBOL JORNADA {$liga->payload->id} {$liga->payload->currentSeason->currentMatchday}" caption="Jornada Actual" color="green"}
 	    </td>
 	    <td style="" colspan="1">
 	     	{button href="FUTBOL JORNADA {$liga->payload->id} TODAS" caption="Campeonato" color="green"}

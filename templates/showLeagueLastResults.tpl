@@ -13,13 +13,13 @@
     {foreach $fixture as $juego}
 	    {strip}
 	    <tr>
-	    	<td>{$juego->date|date_format:"%d/%m/%Y"}</td>
-	        <td>{$juego->homeTeamName}</td>
+	    	<td>{$juego->utcDate|date_format:"%d/%m/%Y %H:%M"}</td>
+	        <td>{$juego->homeTeam->name}</td>
 	        <td>-</td>
-	        <td>{$juego->awayTeamName}</td>
-	        <td><b>{$juego->result->goalsHomeTeam}</b></td>
+	        <td>{$juego->awayTeam->name}</td>
+	        <td><b>{$juego->score->fullTime->homeTeam}</b></td>
 	        <td><b>:</b></td>
-	        <td><b>{$juego->result->goalsAwayTeam}</b></td>
+	        <td><b>{$juego->score->fullTime->awayTeam}</b></td>
 	    </tr>
 	    {/strip}
     {/foreach}

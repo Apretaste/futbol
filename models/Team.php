@@ -101,10 +101,10 @@ class Team extends FutbolCommon
 	public function getFixtures($venue = "", $timeFrame = "")
 	{
 
-		if (!isset($this->_payload->_links->fixtures->href))
-			return false;
+		/*if (!isset($this->_payload->_links->fixtures->href))
+			return false;*/
 
-		$uri = $this->_payload->_links->fixtures->href . '/?venue=' . $venue . '&timeFrame=' . $timeFrame;
+		$uri ="http://api.football-data.org/v2/teams/".$this->_payload->id."/matches?venue=".$venue;
 
 		return $this->getRemoteContent($uri, date("YmdG"));
 	}

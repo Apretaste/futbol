@@ -17,8 +17,7 @@ class FutbolCommon {
 	{
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_HEADER, false);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, [
-			$this->req_preferences['http']['header']
+		curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Auth-Token:b8044b406aca4851ac7ceeea79fccaea"
 		]);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); //Set curl to return the data instead of printing it to the browser.
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
@@ -30,11 +29,12 @@ class FutbolCommon {
 		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		if($httpCode == 404)
 		{
-			/* Handle 404 here. */
+			/* Handle 40
+			4 here. */
+			
 			$data = false;
 		}
 		curl_close($ch);
-
 		return $data;
 	}
 

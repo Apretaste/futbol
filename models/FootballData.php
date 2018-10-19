@@ -99,9 +99,9 @@ class FootballData extends FutbolCommon
 	 */
 	public function getSoccerseasons()
 	{
-		$uri    = $this->baseUri . 'soccerseasons/';
+		$uri    = $this->baseUri . 'competitions?plan=TIER_ONE';
 		$result = $this->getRemoteContent($uri, date("Y"));
-
+		
 		return $result; //new Soccerseason($result);
 	}
 
@@ -114,10 +114,13 @@ class FootballData extends FutbolCommon
 	 */
 	public function getSoccerseasonById($id)
 	{
-		$uri    = $this->baseUri . 'soccerseasons/' . $id;
-		$result = $this->getRemoteContent($uri, date("Ymd"));
+		$uri    = $this->baseUri . 'competitions/' . $id;
+		
 
-		if( ! isset($result->caption)) return null;
+		$result = $this->getRemoteContent($uri, date("Ymd"));
+		
+
+		if( !isset($result->name)) return null;
 
 		return new Soccerseason($result);
 	}

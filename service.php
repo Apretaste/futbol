@@ -32,7 +32,7 @@ class Futbol extends Service
 
 			$response = new Response();
 			$response->setResponseSubject("¿Cual liga deseas consultar?");
-			$response->createFromTemplate("selectLiga.tpl", ["ligas" => $soccerSeasons]);
+			$response->createFromTemplate("selectLiga.tpl", ["ligas" => $soccerSeasons->competitions]);
 
 			return $response;
 		}
@@ -65,12 +65,13 @@ class Futbol extends Service
 		if(strtoupper($journey) == "TODAS")
 		{
 			$fixture          = $soccer_season->getAllFixtures();
-			$response_subject = "Todos los resultados de la " . $soccer_season->payload->caption;
+			var_dump($fixture);
+			$response_subject = "Todos los resultados de la " . $soccer_season->payload->name;
 		}
 		else
 		{
 			$fixture          = $soccer_season->getFixturesByMatchday($journey);
-			$response_subject = $soccer_season->payload->caption . ", Jornada {$journey}";
+			$response_subject = $soccer_season->payload->name . ", Jornada {$journey}";
 		}
 
 		// create the response
@@ -136,17 +137,17 @@ class Futbol extends Service
 		}
 
 		$tableLeague       = $soccerseason->getLeagueTable();
-		$tipoTorneo        = isset($tableLeague->standing) ? 'liga' : 'copa';
-		$currentMatchday   = $soccerseason->payload->currentMatchday;
-		$numberOfMatchdays = $soccerseason->payload->numberOfMatchdays;
-		$nextMatchday      = ($currentMatchday < $numberOfMatchdays) ? ($currentMatchday + 1) : $numberOfMatchdays;
-		$nextFixture       = $soccerseason->getFixturesByMatchday($nextMatchday);
+		$tipoTorneo        = isset($tableLeague->standings) ? 'liga' : 'copa';
+		$currentMatchday   = $soccerseason->payload->currentSeason->currentMatchday;
+		//$numberOfMatchdays = $soccerseason->payload->numberOfMatchdays;
+		//$nextMatchday      = ($currentMatchday < $numberOfMatchdays) ? ($currentMatchday + 1) : $numberOfMatchdays;
+		$nextFixture       = $soccerseason->getFixturesByMatchday($currentMatchday + 1);
 		// create a json object to send to the template
 		$responseContent = [
 			"tipoTorneo" => $tipoTorneo,
 			"liga" => $soccerseason,
 			"posicionesLiga" => $tableLeague,
-			"nextFixture" => $nextFixture,
+			"nextFixture" => $nextFixture
 		];
 		// create the response
 		$response = new Response();
@@ -242,11 +243,12 @@ class Futbol extends Service
 		if(strtoupper($equipo) == "TODOS")
 		{
 			$equipos     = $soccer_season->getTeams();
-			$textoAsunto = "Equipos que compiten en la " . $soccer_season->payload->caption;
+			$textoAsunto = "Equipos que compiten en la " . $soccer_season->payload->name;
+
 		}
 		else
 		{
-			$teamName = substr($query, 4);
+			/*$teamName = substr($query, 4);
 			// search for desired team
 			$searchQuery = $apiFD->searchTeam(urlencode($teamName));
 
@@ -257,21 +259,20 @@ class Futbol extends Service
 				$response->createFromText("No encontramos el equipo que buscabas");
 
 				return $response;
-			}
+			}*/
 
-			$equipos = $apiFD->getTeamById($searchQuery->teams[0]->id);
-
-			$fixturesHome  = $equipos->getFixtures('home')->fixtures;
-			$fixturesAway  = $equipos->getFixtures('away')->fixtures;
-			$players       = $equipos->getPlayers();
+			$equipos = $apiFD->getTeamById($equipo);
+			$fixturesHome  = $equipos->getFixtures('HOME')->matches;
+			$fixturesAway  = $equipos->getFixtures('AWAY')->matches;
+			//$players       = $equipos->getPlayers();
 			$imgTeamSource = $equipos->_payload->crestUrl;
 			$extension     = substr($imgTeamSource, - 4);
 
 			$di               = \Phalcon\DI\FactoryDefault::getDefault();
 			$wwwroot          = $di->get('path')['root'];
-			$imgTeamCacheFile = "$wwwroot/temp/" . "team_" . $id_league . "_" . $searchQuery->teams[0]->id . "_logoCacheFile.png"; //
+			$imgTeamCacheFile = "$wwwroot/temp/" . "team_" . $id_league . "_".$equipo."_logoCacheFile.png"; 
 
-			if( ! file_exists($imgTeamCacheFile))
+			/*if( ! file_exists($imgTeamCacheFile))
 			{
 				$imgTeamSource = $this->file_get_contents_curl($imgTeamSource);
 				if($imgTeamSource != false)
@@ -295,15 +296,14 @@ class Futbol extends Service
 					$dibujo = new ImagickDraw();
 					$dibujo->setFontSize(30);
 
-					$image->newImage(100, 100, new ImagickPixel('#d3d3d3')); //imagen fondo gris
-					/* Crear texto */
+					$image->newImage(100, 100, new ImagickPixel('#d3d3d3')); 
 					$image->annotateImage($dibujo, 10, 45, 0, ' 404!');
 					$image->setImageFormat("png24");
 					$image->resizeImage(1024, 768, imagick::FILTER_LANCZOS, 1);
 					$image->writeImage($imgTeamCacheFile);
 				}
-			}
-			$textoAsunto = "Datos del " . $teamName;
+			}*/
+			$textoAsunto = "Datos del " . $equipos->_payload->name;
 		}
 
 		// create a json object to send to the template
@@ -315,7 +315,7 @@ class Futbol extends Service
 			"juegosHome" => $fixturesHome,
 			"juegosAway" => $fixturesAway,
 			"jugadores" => $players,
-			"imgTeam" => $imgTeamCacheFile
+			//"imgTeam" => $imgTeamCacheFile
 		];
 
 		// get the images to embed into the email

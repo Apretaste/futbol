@@ -9,13 +9,13 @@
 	        <th><h2>Nombre</th>
 	        <!--<th><h2>code</th>-->
 	        <th><h2>Nombre Corto</th>
-	        <th><h2>Valor de la Plantilla</th>
+	        <th><h2>Stadium</th>
 	    </tr>
 	    {foreach $equipos as $team}
 	    <tr bgcolor="{cycle values="#f2f2f2,white"}">
-	        <td><b>{link href="FUTBOL EQUIPO {$liga->payload->id} {$team->name}" caption="{$team->name}"}</b></td>
+	        <td><b>{link href="FUTBOL EQUIPO {$liga->payload->id} {$team->id}" caption="{$team->name}"}</b></td>
 	        <td>{$team->shortName}</td>
-	        <td>{$team->squadMarketValue}</td>
+	        <td>{$team->venue}</td>
 	    </tr>
 	    {/foreach}
 	</table>
@@ -29,19 +29,19 @@
 	</table>
 {else}
 	<table style="text-align:center" width="100%">
-	    <tr>
+	    <!--<tr>
 	        <th colspan="2">{img src="{$imgTeam}" alt="TeamLogo" width="100px" height="130px"}</th>
-	    </tr>
-	    <tr>
+	    </tr>-->
+	    <!--<tr>
 	        <td colspan="2"><h2><b>{$equipos->_payload->name}</b></h2></td>
-	    </tr>
+	    </tr>-->
 	    <tr>
 	        <th><h2>Nombre Corto</h2></th>
-	        <th><h2>Valor de la Plantilla</h2></th>
+	        <th><h2>Stadium</h2></th>
 	    </tr>
 	    <tr>
 	        <td>{$equipos->_payload->shortName}</td>
-	        <td>{$equipos->_payload->squadMarketValue}</td>
+	        <td>{$equipos->_payload->venue}</td>
 	    </tr>
 	</table>
 	{space15}
@@ -50,14 +50,14 @@
         <tr>
             <th><h2>Nombre</h2></th>
             <th><h2>Posici&oacute;n</h2></th>
-            <th><h2># Camiseta</h2></th>
+            <!--<th><h2># Camiseta</h2></th>-->
             <th><h2>Fecha de Nacimiento</h2></th>
         </tr>
-        {foreach $jugadores as $player}
+        {foreach $equipos->_payload->squad as $player}
         <tr>
             <td><b>{$player->name}</b></td>
             <td>{$player->position}</td>
-            <td>{$player->jerseyNumber}</td>
+            <!--<td>{$player->jerseyNumber}</td>-->
             <td>{$player->dateOfBirth|date_format:"%d/%m/%Y"}</td>
         </tr>
         {/foreach}
@@ -74,13 +74,13 @@
         </tr>
         {foreach $juegosHome as $juego}
         <tr>
-            <td>{$juego->date|date_format:"%d/%m/%Y"}</td>
-            <td><b>{$juego->homeTeamName}</b></td>
+            <td>{$juego->utcDate|date_format:"%d/%m/%Y"}</td>
+            <td><b>{$juego->homeTeam->name}</b></td>
             <td>-</td>
-            <td>{$juego->awayTeamName}</td>
-            <td><b>{$juego->result->goalsHomeTeam}</b></td>
+            <td>{$juego->awayTeam->name}</td>
+            <td><b>{$juego->score->fullTime->homeTeam}</b></td>
             <td>:</td>
-            <td>{$juego->result->goalsAwayTeam}</td>
+            <td>{$juego->score->fullTime->awayTeam}</td>
         </tr>
         {/foreach}
     </table>
@@ -96,13 +96,13 @@
         </tr>
         {foreach $juegosAway as $juego}
         <tr>
-            <td>{$juego->date|date_format:"%d/%m/%Y"}</td>
-            <td>{$juego->homeTeamName}</td>
+            <td>{$juego->utcDate|date_format:"%d/%m/%Y"}</td>
+            <td>{$juego->homeTeam->name}</td>
             <td>-</td>
-            <td><b>{$juego->awayTeamName}</b></td>
-            <td>{$juego->result->goalsHomeTeam}</td>
+            <td><b>{$juego->awayTeam->name}</b></td>
+            <td>{$juego->score->fullTime->homeTeam}</td>
             <td>:</td>
-            <td><b>{$juego->result->goalsAwayTeam}</b></td>
+            <td><b>{$juego->score->fullTime->awayTeam}</b></td>
         </tr>
         {/foreach}
     </table>
