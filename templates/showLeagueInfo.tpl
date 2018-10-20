@@ -1,10 +1,13 @@
+<style type="text/css">
+    {include file="../includes/style.css"}
+</style>
 <center>
 <h1>{$liga->payload->name}</h1>
 {space5}
 <h2>Posiciones</h2>
 {space10}
 {if $tipoTorneo == 'liga'}
-    <table style="text-align:center" width="100%">
+    <table style="text-align:center" width="100%" class="table">
         <tr>
             <th><h2>#</h2></th>
             <th><h2>Equipo</h2></th>
@@ -35,7 +38,7 @@
     {space10}
 	<h2>Próxima jornada</h2>
 	{space10}
-	<table style="text-align:center" width="100%">
+	<table style="text-align:center" width="100%" class="table">
 		<tr>
 	    	<th><h2>Local</h2></th>
 		    <th></th>
@@ -61,7 +64,7 @@
 {else}
 	{foreach $posicionesLiga->standings as $group}
         {if $group->type=="TOTAL"}
-     	<table style="text-align:center" width="100%">
+     	<table style="text-align:center" width="100%" class="table">
          	<tr>
                 <th colspan="8">{$group->group}</th>
             </tr>

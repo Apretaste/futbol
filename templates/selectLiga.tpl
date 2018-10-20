@@ -1,8 +1,11 @@
+<style type="text/css">
+  {include file="../includes/style.css"}
+</style>
 <center>
 	<h1>Selecciona tu liga:</h1>
 </center>
 
-<table style="text-align:center;" width="100%">
+<table style="text-align:center;" width="100%" class="table">
 	<tr>
 		<th><h2>Liga</h2></th>
 		<th><h2>Jornada Actual</h2></th>

@@ -1,9 +1,12 @@
+<style type="text/css">
+    {include file="../includes/style.css"}
+</style>
 <center>
 <h1>{$titulo}</h1>
 
 {space10}
 {if $equipo|lower == "todos"}
-	<table style="text-align:center" width="100%">
+	<table style="text-align:center" width="100%" class="table">
 	    <tr>
 	        <!--<th><h2>crestUrl</th>-->
 	        <th><h2>Nombre</th>
@@ -46,7 +49,7 @@
 	</table>
 	{space15}
 	<h2>Jugadores del {$equipos->_payload->name}</h2>
-	<table style="text-align:center" width="100%">
+	<table style="text-align:center" width="100%" class="table">
         <tr>
             <th><h2>Nombre</h2></th>
             <th><h2>Posici&oacute;n</h2></th>
@@ -64,7 +67,7 @@
     </table>
     {space15}
 	<h2>Partidos en casa del {$equipos->_payload->name}</h2>
-	<table style="text-align:center" width="100%">
+	<table style="text-align:center" width="100%" class="table">
         <tr>
             <th><h2>Fecha</h2></th>
             <th><h2>Local</h2></th>
@@ -86,7 +89,7 @@
     </table>
     {space15}
 	<h2>Partidos de visitante del {$equipos->_payload->name}</h2>
-	<table style="text-align:center" width="100%">
+	<table style="text-align:center" width="100%" class="table">
         <tr>
             <th><h2>Fecha</h2></th>
             <th><h2>Local</h2></th>

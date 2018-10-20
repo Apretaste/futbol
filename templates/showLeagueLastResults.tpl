@@ -1,8 +1,11 @@
+<style type="text/css">
+{include file="../includes/style.css"}
+</style>
 <center>
 <h1>{$titulo}</h1>
 
 {space10}
-<table style="text-align:center" width="100%">
+<table style="text-align:center" width="100%" class="table">
 	<tr>
 		<th><h2>Fecha</h2></th>
     	<th><h2>Local</h2></th>
