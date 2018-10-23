@@ -33,7 +33,7 @@ class Futbol extends Service
 			$response = new Response();
 			$response->setResponseSubject("¿Cual liga deseas consultar?");
 			$response->createFromTemplate("selectLiga.tpl", ["ligas" => $soccerSeasons->competitions]);
-
+			$response->setCache(30);
 			return $response;
 		}
 	}
@@ -83,7 +83,7 @@ class Futbol extends Service
 			"jornada" => $journey,
 			"fixture" => $fixture
 		]);
-
+		$response->setCache(30);
 		return $response;
 	}
 
@@ -153,7 +153,7 @@ class Futbol extends Service
 		$response = new Response();
 		$response->setResponseSubject("Informacion de la liga...");
 		$response->createFromTemplate("showLeagueInfo.tpl", $responseContent);
-
+		$response->setCache(30);
 		return $response;
 	}
 
@@ -201,7 +201,7 @@ class Futbol extends Service
 			$response = new Response();
 			$response->setResponseSubject("¿Cual jornada y de que liga deseas consultar?");
 			$response->createFromTemplate("selectLiga.tpl", ["ligas" => $soccerSeasons]);
-
+			$response->setCache(30);
 			return $response;
 		}
 		else
@@ -230,7 +230,7 @@ class Futbol extends Service
 			$response = new Response();
 			$response->setResponseSubject("No encontramos informacion de la liga en estos momentos.");
 			$response->createFromText("No encontramos informaci&oacute;n de la liga en estos momentos. Por favor intente m&aacute;s tarde.");
-
+			$response->setCache(30);
 			return $response;
 		}
 
@@ -331,7 +331,7 @@ class Futbol extends Service
 		$response = new Response();
 		$response->setResponseSubject($textoAsunto);
 		$response->createFromTemplate("showLeagueTeams.tpl", $responseContent, $images);
-
+		$response->setCache(30);
 		return $response;
 	}
 
