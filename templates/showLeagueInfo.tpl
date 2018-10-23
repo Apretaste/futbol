@@ -55,11 +55,7 @@
 		    </tr>
 		    {/strip}
 	    {/foreach}
-	    {*if $liga->payload->currentSeason->currentMatchday >= $liga->payload->numberOfMatchdays*}
-	    <tr>
-		    <td colspan="4"><h2><p>&Eacute;sta fue la &uacute;ltima jornada de &eacute;sta temporada.</p>Nos vemos en la pr&oacute;xima temporada!</h2></td>
-		</tr>
-	    {/if*}
+	    
 	</table>
 {else}
 	{foreach $posicionesLiga->standings as $group}
