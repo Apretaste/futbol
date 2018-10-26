@@ -89,7 +89,6 @@
 	{/foreach}
 {/if}
 {space5}
-<!--<p>Posiciones en la jornada {$liga->payload->currentMatchday} de {$liga->payload->numberOfMatchdays}.</p>-->
 
 {space15}
 <table style="text-align:center;" width="100%">
