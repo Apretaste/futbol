@@ -1,362 +1,334 @@
 <?php
 
-include 'models/FootballData.php';
+include __DIR__.'/models/FootballData.php';
 
 /**
- * Apretaste Futbol subservice
+ * Futbol Service
  *
- * @author  Daniel Freitag <daniel@football-data.org>
  * @author  Kuma [@kumahacker] <kumahavana@gmail.com>
- * @version 2.0
- * @date    19.10.2017
+ * @version 3.0
  */
-class Futbol extends Service
+class FutbolService extends ApretasteService
 {
-	public $apiFD = null;
-	public $soccerSeasons = null; //Get all soccer seasons available
 
-	/**
-	 * Function executed when the service is called
-	 *
-	 * @param Request
-	 *
-	 * @return Response
-	 * */
-	public function _main(Request $request)
-	{
-		$apiFD = new FootballData();
-		//Get all soccer seasons available
-		$soccerSeasons = $apiFD->getSoccerseasons();
-		if(empty($request->query) || (strtolower($request->query) != 'liga') || (strtolower($request->query) != 'jornada') || (strtolower($request->query) != 'equipo'))
-		{
+    public $apiFD = null;
 
-			$response = new Response();
-			$response->setResponseSubject("¿Cual liga deseas consultar?");
-			$response->createFromTemplate("selectLiga.tpl", ["ligas" => $soccerSeasons->competitions]);
-			$response->setCache(30);
-			return $response;
-		}
-	}
+    public $soccerSeasons = null; // Get all soccer seasons available
 
-	/**
-	 * Search a journey by id
-	 *
-	 * @param $query
-	 * @param $apiFD
-	 *
-	 * @return \Response
-	 */
-	private function searchJourneyById($query, $apiFD)
-	{
-		$query_data    = explode(" ", $query);
-		$id_league     = $query_data[0];
-		$journey       = isset($query_data[1]) ? $query_data[1] : 1;
-		$soccer_season = $apiFD->getSoccerseasonById($id_league);
+    /**
+     * Function executed when the service is called
+     *
+     * @param Request
+     *
+     **/
+    public function _main()
+    {
+        $apiFD = new FootballData();
 
-		if(is_null($soccer_season))
-		{
-			$response = new Response();
-			$response->setResponseSubject("No encontramos informacion de la liga en estos momentos.");
-			$response->createFromText("No encontramos informaci&oacute;n de la liga en estos momentos. Por favor intente m&aacute;s tarde.");
+        // Get all soccer seasons available
+        $soccerSeasons = $apiFD->getSoccerseasons();
 
-			return $response;
-		}
+        if (empty($this->request->input->data->query) || (strtolower($this->request->input->data->query) != 'liga') || (strtolower($this->request->input->data->query) != 'jornada') || (strtolower($this->request->input->data->query) != 'equipo')) {
 
-		if(strtoupper($journey) == "TODAS")
-		{
-			$fixture          = $soccer_season->getAllFixtures();
-			
-			$response_subject = "Todos los resultados de la " . $soccer_season->payload->name;
-		}
-		else
-		{
-			$fixture          = $soccer_season->getFixturesByMatchday($journey);
-			$response_subject = $soccer_season->payload->name . ", Jornada {$journey}";
-		}
+            $this->response->setCache();
 
-		// create the response
-		$response = new Response();
-		$response->setResponseSubject($response_subject);
-		$response->createFromTemplate("showLeagueLastResults.tpl", [
-			"titulo" => $response_subject,
-			"liga" => $soccer_season,
-			"jornada" => $journey,
-			"fixture" => $fixture
-		]);
-		$response->setCache(30);
-		return $response;
-	}
+            $this->response->setTemplate("selectLiga.ejs", [
+                "ligas" => $soccerSeasons->competitions
+            ]);
 
-	/**
-	 * Subservice LIGA
-	 *
-	 * @param \Request $request
-	 *
-	 * @return \Response
-	 */
-	public function _liga(Request $request)
-	{
-		$apiFD = new FootballData();
+        }
+    }
 
-		// Get all soccer seasons available
-		$soccerSeasons = $apiFD->getSoccerseasons();
+    /**
+     * Search a journey by id
+     *
+     * @param $query
+     * @param $apiFD
+     *
+     */
+    private function searchJourneyById($query, $apiFD)
+    {
+        $query_data = explode(" ", $query);
+        $id_league = $query_data[0];
+        $journey = isset($query_data[1]) ? $query_data[1] : 1;
+        $soccer_season = $apiFD->getSoccerseasonById($id_league);
 
-		if(empty($request->query))
-		{
-			$response = new Response();
-			$response->setResponseSubject("¿Cual liga deseas consultar?");
-			$response->createFromTemplate("selectLiga.tpl", ["ligas" => $soccerSeasons]);
+        if (is_null($soccer_season)) {
 
-			return $response;
-		}
-		else
-		{
-			return $this->searchInfoLeagueById($request->query, $apiFD);
-		}
-	}
+            $this->simpleMessage(
+                "No encontramos informacion de la liga en estos momentos.",
+                "No encontramos informaci&oacute;n de la liga en estos momentos. Por favor intente m&aacute;s tarde.");
 
-	/**
-	 * Search information about league
-	 *
-	 * @param $query
-	 * @param $apiFD
-	 *
-	 * @return \Response
-	 */
-	private function searchInfoLeagueById($query, $apiFD)
-	{
-		$soccerseason = $apiFD->getSoccerseasonById($query);
+            return;
+        }
 
-		if(is_null($soccerseason))
-		{
-			$response = new Response();
-			$response->setResponseSubject("No encontramos informacion de la liga en estos momentos.");
-			$response->createFromText("No encontramos informaci&oacute;n de la liga en estos momentos. Por favor intente m&aacute;s tarde.");
+        if (strtoupper($journey) == "TODAS") {
+            $fixture = $soccer_season->getAllFixtures();
 
-			return $response;
-		}
+            $response_subject = "Todos los resultados de la ".$soccer_season->payload->name;
+        } else {
+            $fixture = $soccer_season->getFixturesByMatchday($journey);
+            $response_subject = $soccer_season->payload->name.", Jornada {$journey}";
+        }
 
-		$tableLeague       = $soccerseason->getLeagueTable();
-		$tipoTorneo        = ($tableLeague->standings[0]->stage=="GROUP_STAGE") ? 'copa' : 'liga';
-		$currentMatchday   = $soccerseason->payload->currentSeason->currentMatchday;
-		//$numberOfMatchdays = $soccerseason->payload->numberOfMatchdays;
-		//$nextMatchday      = ($currentMatchday < $numberOfMatchdays) ? ($currentMatchday + 1) : $numberOfMatchdays;
-		$nextFixture       = $soccerseason->getFixturesByMatchday($currentMatchday + 1);
-		// create a json object to send to the template
-		$responseContent = [
-			"tipoTorneo" => $tipoTorneo,
-			"liga" => $soccerseason,
-			"posicionesLiga" => $tableLeague,
-			"nextFixture" => $nextFixture
-		];
-		// create the response
-		$response = new Response();
-		$response->setResponseSubject("Informacion de la liga...");
-		$response->createFromTemplate("showLeagueInfo.tpl", $responseContent);
-		$response->setCache(30);
-		return $response;
-	}
+        // create the response
 
-	/**
-	 * Subservice JORNADA
-	 *
-	 * @param \Request $request
-	 *
-	 * @return \Response
-	 */
-	public function _jornada(Request $request)
-	{
-		$apiFD = new FootballData();
+        $this->response->setTemplate("showLeagueLastResults.ejs", [
+            "titulo"  => $response_subject,
+            "liga"    => $soccer_season,
+            "jornada" => $journey,
+            "fixture" => $fixture
+        ]);
+    }
 
-		//Get all soccer seasons available
-		$soccerSeasons = $apiFD->getSoccerseasons();
-		if(empty($request->query))
-		{
-			$response = new Response();
-			$response->setResponseSubject("¿Cual jornada y de que liga deseas consultar?");
-			$response->createFromTemplate("selectLiga.tpl", ["ligas" => $soccerSeasons]);
+    /**
+     * Subservice LIGA
+     *
+     * @param \Request $request
+     *
+     */
+    public function _liga()
+    {
+        $apiFD = new FootballData();
 
-			return $response;
-		}
-		else
-			return $this->searchJourneyById($request->query, $apiFD);
+        // Get all soccer seasons available
+        $soccerSeasons = $apiFD->getSoccerseasons();
 
-	}
+        if (empty($this->request->input->data->query)) {
 
-	/**
-	 * Subservice EQUIPO
-	 *
-	 * @param \Request $request
-	 *
-	 * @return \Response
-	 */
-	public function _equipo(Request $request)
-	{
-		$apiFD = new FootballData();
+            $this->response->setTemplate("selectLiga.ejs", [
+                "ligas" => $soccerSeasons
+            ]);
 
-		//Get all soccer seasons available
-		$soccerSeasons = $apiFD->getSoccerseasons();
-		if(empty($request->query))
-		{
-			$response = new Response();
-			$response->setResponseSubject("¿Cual jornada y de que liga deseas consultar?");
-			$response->createFromTemplate("selectLiga.tpl", ["ligas" => $soccerSeasons]);
-			$response->setCache(30);
-			return $response;
-		}
-		else
-		{
-			return $this->searchTeamById($request->query, $apiFD);
-		}
-	}
+            return;
+        } else {
+            $this->searchInfoLeagueById($this->request->input->data->query, $apiFD);
+        }
+    }
 
-	/**
-	 * Search team by ID
-	 *
-	 * @param $query
-	 * @param $apiFD
-	 *
-	 * @return \Response
-	 */
-	private function searchTeamById($query, $apiFD)
-	{
-		$query_data       = explode(" ", $query);
-		$id_league        = $query_data[0];
-		$equipo           = $query_data[1];
-		$soccer_season    = $apiFD->getSoccerseasonById($id_league);
+    /**
+     * Search information about league
+     *
+     * @param $query
+     * @param $apiFD
+     *
+     */
+    private function searchInfoLeagueById($query, $apiFD)
+    {
+        $soccerseason = $apiFD->getSoccerseasonById($query);
 
-		if(is_null($soccer_season))
-		{
-			$response = new Response();
-			$response->setResponseSubject("No encontramos informacion de la liga en estos momentos.");
-			$response->createFromText("No encontramos informaci&oacute;n de la liga en estos momentos. Por favor intente m&aacute;s tarde.");
-			$response->setCache(30);
-			return $response;
-		}
+        if (is_null($soccerseason)) {
 
-		$equipos          = null;
-		$fixturesHome     = null;
-		$fixturesAway     = null;
-		$players          = null;
-		$imgTeamCacheFile = null;
+            $this->response->setResponseSubject();
+            $this->simpleMessage(
+                "No encontramos informacion de la liga en estos momentos.",
+                "No encontramos informaci&oacute;n de la liga en estos momentos. Por favor intente m&aacute;s tarde.");
 
-		if(strtoupper($equipo) == "TODOS")
-		{
-			$equipos     = $soccer_season->getTeams();
-			$textoAsunto = "Equipos que compiten en la " . $soccer_season->payload->name;
+            return;
+        }
 
-		}
-		else
-		{
-			/*$teamName = substr($query, 4);
-			// search for desired team
-			$searchQuery = $apiFD->searchTeam(urlencode($teamName));
+        $tableLeague = $soccerseason->getLeagueTable();
+        $tipoTorneo = ($tableLeague->standings[0]->stage == "GROUP_STAGE") ? 'copa' : 'liga';
+        $currentMatchday = $soccerseason->payload->currentSeason->currentMatchday;
+        //$numberOfMatchdays = $soccerseason->payload->numberOfMatchdays;
+        //$nextMatchday      = ($currentMatchday < $numberOfMatchdays) ? ($currentMatchday + 1) : $numberOfMatchdays;
+        $nextFixture = $soccerseason->getFixturesByMatchday($currentMatchday + 1);
+        // create a json object to send to the template
+        $responseContent = [
+            "tipoTorneo"     => $tipoTorneo,
+            "liga"           => $soccerseason,
+            "posicionesLiga" => $tableLeague,
+            "nextFixture"    => $nextFixture
+        ];
 
-			if( ! isset($searchQuery->teams[0]->id))
-			{
-				$response = new Response();
-				$response->setResponseSubject("Equipo no encontrado");
-				$response->createFromText("No encontramos el equipo que buscabas");
+        $this->response->setTemplate("showLeagueInfo.ejs", $responseContent);
+    }
 
-				return $response;
-			}*/
+    /**
+     * Subservice JORNADA
+     *
+     * @param \Request $request
+     */
+    public function _jornada()
+    {
+        $apiFD = new FootballData();
 
-			$equipos = $apiFD->getTeamById($equipo);
-			$fixturesHome  = $equipos->getFixtures('HOME')->matches;
-			$fixturesAway  = $equipos->getFixtures('AWAY')->matches;
-			//$players       = $equipos->getPlayers();
+        //Get all soccer seasons available
+        $soccerSeasons = $apiFD->getSoccerseasons();
 
-			$imgTeamSource = $equipos->_payload->crestUrl;
-			$extension     = substr($imgTeamSource, - 4);
+        if (empty($this->request->input->data->query)) {
 
-			$di               = \Phalcon\DI\FactoryDefault::getDefault();
-			$wwwroot          = $di->get('path')['root'];
-			$imgTeamCacheFile = "$wwwroot/temp/" . "team_" . $id_league . "_".$equipo."_logoCacheFile.svg"; 
+            $this->response->setTemplate("selectLiga.ejs", [
+                "ligas" => $soccerSeasons
+            ]);
 
-			if( ! file_exists($imgTeamCacheFile))
-			{
+            return;
+        }
 
-				$imgTeamSource = $this->file_get_contents_curl($imgTeamSource);
-				if($imgTeamSource != false)
-				{
-					if(strtolower($extension) == '.svg')
-					{
-						file_put_contents($imgTeamCacheFile, $imgTeamSource);
-						/*$image = new Imagick();
-						$image->readImageBlob($imgTeamSource); //imagen svg
-						$image->setImageFormat("png24");
-						$image->resizeImage(1024, 768, imagick::FILTER_LANCZOS, 1);
-						$image->writeImage($imgTeamCacheFile); //imagen png*/
-					}
-					else
-					{
-						file_put_contents($imgTeamCacheFile, $imgTeamSource);
-					}
-				}
+        $this->searchJourneyById($this->request->input->data->query, $apiFD);
+    }
 
-				/*else
-				{
-					$image  = new Imagick();
-					$dibujo = new ImagickDraw();
-					$dibujo->setFontSize(30);
+    /**
+     * Subservice EQUIPO
+     *
+     * @param \Request $request
+     *
+     */
+    public function _equipo()
+    {
+        $apiFD = new FootballData();
 
-					$image->newImage(100, 100, new ImagickPixel('#d3d3d3')); 
-					$image->annotateImage($dibujo, 10, 45, 0, ' 404!');
-					$image->setImageFormat("png24");
-					$image->resizeImage(1024, 768, imagick::FILTER_LANCZOS, 1);
-					$image->writeImage($imgTeamCacheFile);
-				}*/
-			}
-			$textoAsunto = "Datos del " . $equipos->_payload->name;
-		}
+        //Get all soccer seasons available
+        $soccerSeasons = $apiFD->getSoccerseasons();
+        if (empty($this->request->input->data->query)) {
 
-		// create a json object to send to the template
-		$responseContent = [
-			"titulo" => $textoAsunto,
-			"liga" => $soccer_season,
-			"equipo" => $equipo,
-			"equipos" => $equipos,
-			"juegosHome" => $fixturesHome,
-			"juegosAway" => $fixturesAway,
-			"jugadores" => $players,
-			"imgTeam" => $imgTeamCacheFile
-		];
+            $this->response->setTemplate("selectLiga.ejs", [
+                "ligas" => $soccerSeasons
+            ]);
 
-		// get the images to embed into the email
-		$images = [
-			"imgTeam" => $imgTeamCacheFile
-		];
+            return;
+        }
 
-		// create the response
-		$response = new Response();
-		$response->setResponseSubject($textoAsunto);
-		$response->createFromTemplate("showLeagueTeams.tpl", $responseContent, $images);
-		$response->setCache(30);
-		return $response;
-	}
+        $this->searchTeamById($this->request->input->data->query, $apiFD);
+    }
 
-	private function file_get_contents_curl($url)
-	{
+    /**
+     * Search team by ID
+     *
+     * @param $query
+     * @param $apiFD
+     */
+    private function searchTeamById($query, $apiFD)
+    {
+        $query_data = explode(" ", $query);
+        $id_league = $query_data[0];
+        $equipo = $query_data[1];
+        $soccer_season = $apiFD->getSoccerseasonById($id_league);
 
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_HEADER, 0);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); //Set curl to return the data instead of printing it to the browser.
-		curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Auth-Token:b8044b406aca4851ac7ceeea79fccaea"
-		]);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-		curl_setopt($ch, CURLOPT_URL, $url);
-		$data = curl_exec($ch);
-		/* Check for 404 (file not found). */
-		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-		if($httpCode == 404)
-		{
-			/* Handle 404 here. */
-			$data = false;
-		}
-		curl_close($ch);
+        if (is_null($soccer_season)) {
 
-		return $data;
-	}
+            $this->simpleMessage(
+                "No encontramos informacion de la liga en estos momentos.",
+                "No encontramos informaci&oacute;n de la liga en estos momentos. Por favor intente m&aacute;s tarde.");
+
+            return;
+        }
+
+        $equipos = null;
+        $fixturesHome = null;
+        $fixturesAway = null;
+        $players = null;
+        $imgTeamCacheFile = null;
+
+        if (strtoupper($equipo) == "TODOS") {
+            $equipos = $soccer_season->getTeams();
+            $textoAsunto = "Equipos que compiten en la ".$soccer_season->payload->name;
+
+        } else {
+            /*$teamName = substr($query, 4);
+            // search for desired team
+            $searchQuery = $apiFD->searchTeam(urlencode($teamName));
+
+            if( ! isset($searchQuery->teams[0]->id))
+            {
+                
+                $this->response->setResponseSubject("Equipo no encontrado");
+                $this->response->createFromText("No encontramos el equipo que buscabas");
+
+                return;
+            }*/
+
+            $equipos = $apiFD->getTeamById($equipo);
+            $fixturesHome = $equipos->getFixtures('HOME')->matches;
+            $fixturesAway = $equipos->getFixtures('AWAY')->matches;
+            //$players       = $equipos->getPlayers();
+
+            $imgTeamSource = $equipos->_payload->crestUrl;
+            $extension = substr($imgTeamSource, -4);
+
+            $di = \Phalcon\DI\FactoryDefault::getDefault();
+            $wwwroot = $di->get('path')['root'];
+            $imgTeamCacheFile = "$wwwroot/temp/"."team_".$id_league."_".$equipo."_logoCacheFile.svg";
+
+            if (!file_exists($imgTeamCacheFile)) {
+
+                $imgTeamSource = $this->file_get_contents_curl($imgTeamSource);
+                if ($imgTeamSource != false) {
+                    if (strtolower($extension) == '.svg') {
+                        file_put_contents($imgTeamCacheFile, $imgTeamSource);
+                        /*$image = new Imagick();
+                        $image->readImageBlob($imgTeamSource); //imagen svg
+                        $image->setImageFormat("png24");
+                        $image->resizeImage(1024, 768, imagick::FILTER_LANCZOS, 1);
+                        $image->writeImage($imgTeamCacheFile); //imagen png*/
+                    } else {
+                        file_put_contents($imgTeamCacheFile, $imgTeamSource);
+                    }
+                }
+
+                /*else
+                {
+                    $image  = new Imagick();
+                    $dibujo = new ImagickDraw();
+                    $dibujo->setFontSize(30);
+
+                    $image->newImage(100, 100, new ImagickPixel('#d3d3d3')); 
+                    $image->annotateImage($dibujo, 10, 45, 0, ' 404!');
+                    $image->setImageFormat("png24");
+                    $image->resizeImage(1024, 768, imagick::FILTER_LANCZOS, 1);
+                    $image->writeImage($imgTeamCacheFile);
+                }*/
+            }
+            $textoAsunto = "Datos del ".$equipos->_payload->name;
+        }
+
+        // create a json object to send to the template
+        $responseContent = [
+            "titulo"     => $textoAsunto,
+            "liga"       => $soccer_season,
+            "equipo"     => $equipo,
+            "equipos"    => $equipos,
+            "juegosHome" => $fixturesHome,
+            "juegosAway" => $fixturesAway,
+            "jugadores"  => $players,
+            "imgTeam"    => $imgTeamCacheFile
+        ];
+
+        // get the images to embed into the email
+        $images = [
+            "imgTeam" => $imgTeamCacheFile
+        ];
+
+        $this->response->setTemplate("showLeagueTeams.ejs", $responseContent, $images);
+    }
+
+    /**
+     * @param $url
+     *
+     * @return bool|string
+     */
+    private function file_get_contents_curl($url)
+    {
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); //Set curl to return the data instead of printing it to the browser.
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "X-Auth-Token:b8044b406aca4851ac7ceeea79fccaea"
+        ]);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_URL, $url);
+        $data = curl_exec($ch);
+        /* Check for 404 (file not found). */
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if ($httpCode == 404) {
+            /* Handle 404 here. */
+            $data = false;
+        }
+        curl_close($ch);
+
+        return $data;
+    }
 }
