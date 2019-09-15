@@ -1,3 +1,7 @@
+body {
+  font-weight: bold;
+}
+
 .table{
   width: 100%;
   border-collapse: collapse;
@@ -23,4 +27,8 @@
   border-radius: 2px 0 0 2px;
   width: 100px;
   margin: 10px;
+}
+
+ul.tabs {
+  background: none;
 }
