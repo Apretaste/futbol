@@ -1,6 +1,26 @@
 <div class="row">
-    <div class="col l12 m12 x12 s12">
+    <div class="col l12 m12 x12 s12 center">
+        <img src = "{{APP_SERVICE_PATH}}/images/<%= liga.payload.code %>.png" width="100" />
         <h1><%= liga.payload.name %></h1>
+
+        <div class="row">
+            <div class="col l6 m6 x6 s6 center">
+                <a href="#!"  onclick="apretaste.send({
+                        command: 'FUTBOL JORNADA',
+                        data: {
+                            payload: liga.payload.id,
+                            matchDay: liga.payload.currentSeason.currentMatchday
+                        }});">Jornada actual</a>
+            </div>
+            <div class="col l6 m6 x6 s6 center">
+                 <a href="#!" class="" onclick="apretaste.send({
+                        command: 'FUTBOL JORNADA',
+                        data: {
+                            payload: liga.payload.id,
+                            matchDay: 'TODAS'
+                        }});">Campeonato</a>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -109,21 +129,9 @@
     <% }  %>
 <% } %>
 
-<div class="row">
-    <div class="col l6 m6 x6 s6">
-        <a href="#!" class="btn" onclick="apretaste.send({
-                command: 'FUTBOL JORNADA',
-                data: {
-                    payload: liga.payload.id,
-                    matchDay: liga.payload.currentSeason.currentMatchday
-                }});">Jornada actual</a>
-    </div>
-    <div class="col l6 m6 x6 s6">
-         <a href="#!" class="btn" onclick="apretaste.send({
-                command: 'FUTBOL JORNADA',
-                data: {
-                    payload: liga.payload.id,
-                    matchDay: liga.payload.currentSeason.currentMatchday
-                }});">Campeonato</a>
-    </div>
+<!-- back floating button -->
+<div class="fixed-action-btn">
+	<a class="btn-floating btn-large waves-effect waves-light green" href="#!" onclick="apretaste.send({'command':'BILLBOARD'})">
+		<i class="material-icons">arrow_back</i>
+	</a>
 </div>
