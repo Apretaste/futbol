@@ -50,7 +50,12 @@ class FutbolService extends ApretasteService
     {
         $query_data = explode(" ", $query);
         $id_league = $query_data[0];
-        $journey = isset($query_data[1]) ? $query_data[1] : 1;
+        $journey = 1;
+
+        if (isset($this->request->input->data->matchDay)) {
+            $journey = $this->request->input->data->matchDay;
+        }
+
         $soccer_season = $apiFD->getSoccerseasonById($id_league);
 
         if (is_null($soccer_season)) {
@@ -68,7 +73,7 @@ class FutbolService extends ApretasteService
             $response_subject = "Todos los resultados de la ".$soccer_season->payload->name;
         } else {
             $fixture = $soccer_season->getFixturesByMatchday($journey);
-            $response_subject = $soccer_season->payload->name.", Jornada {$journey}";
+            $response_subject = $soccer_season->payload->name."<br/>Jornada {$journey}";
         }
 
         // create the response
