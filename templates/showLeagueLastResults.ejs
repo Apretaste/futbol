@@ -1,6 +1,12 @@
+<div style="background: url('{{APP_SERVICE_PATH}}/images/<%= liga.payload.code %>.png');opacity: 0.05; z-index:-1000;position:fixed;top:0px;left:0px; min-height:50%; width:100%;background-size:cover;">
+</div>
 <div class="row">
-    <div class="col l12 m12 x12 s12">
-        <h1><%= titulo %></h1>
+    <div class="col l12 m12 x12 s12center ">
+		<h1> <a href="#!" class="btn" onclick="apretaste.send({
+                command: 'FUTBOL LIGA',
+                data: {
+                    payload: liga.payload.id
+                }});"><%= titulo %></a></h1>
     </div>
 </div>
 
@@ -39,4 +45,11 @@
                     payload: liga.payload.id
                 }});">Ver liga</a>
     </div>
+</div>
+
+	<!-- back floating button -->
+<div class="fixed-action-btn">
+	<a class="btn-floating btn-large waves-effect waves-light green" href="#!" onclick="apretaste.send({command: 'FUTBOL LIGA',data: {payload: liga.payload.id}});">
+		<i class="material-icons">arrow_back</i>
+	</a>
 </div>
