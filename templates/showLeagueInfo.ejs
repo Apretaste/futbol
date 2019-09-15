@@ -87,10 +87,10 @@
                             </tr>
                             <% for(var i = 0;i < nextFixture.length; i++) {
                                 var juego = nextFixture[i]; %>
-                                <tr>
-                                    <td colspan="3" class="center"><%= formatDate(juego.utcDate) %></td>
+                                <tr style="border-bottom: none;">
+                                    <td colspan="3" class="center" ><%= formatDate(juego.utcDate) %></td>
                                 </tr>
-                                <tr>
+                                <tr style="border-bottom: none;">
                                     <td class="center"><%= juego.homeTeam.name %></td>
                                     <td class="center">Vs.</td>
                                     <td class="center"><%= juego.awayTeam.name %></td>
@@ -111,10 +111,10 @@
                             <th colspan="8"><%= group.group %></th>
                         </tr>
                         <tr>
-                            <th><h2>#</h2></th>
-                            <th><h2>Equipo</h2></th>
+                            <th><h2></h2></th>
+                            <th><h2></h2></th>
                             <th><h2>PJ</h2></th>
-                            <th><h2>Puntos</h2></th>
+                            <th><h2>P</h2></th>
                             <th><h2>GF</h2></th>
                             <th><h2>GC</h2></th>
                             <th><h2>Dif</h2></th>
