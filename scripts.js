@@ -15,3 +15,8 @@ function formatDate(dateStr) {
 
   return day + '/' + month + '/' + year + ' ' + hour + ':' + minutes + amOrPm;
 }
+
+
+$(document).ready(function(){
+  $('.tabs').tabs();
+});
