@@ -1,4 +1,4 @@
-.table{
+/*.table{
   width: 100%;
   border-collapse: collapse;
 }
@@ -16,7 +16,7 @@
     font-size: 1em;
   }
 }
-
+*/
 .card.horizontal .card-image img {
 
   border-radius: 2px 0 0 2px;
