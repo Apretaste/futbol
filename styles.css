@@ -20,7 +20,6 @@
 .card.horizontal .card-image img {
 
   border-radius: 2px 0 0 2px;
-  max-width: 120px;
-  width: auto;
-
+  width: 100px;
+  margin: 10px;
 }
