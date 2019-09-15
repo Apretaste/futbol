@@ -182,7 +182,7 @@ class FutbolService extends ApretasteService
         $soccerSeasons = $apiFD->getSoccerseasons();
         if (empty($this->request->input->data->query)) {
             $this->response->setLayout('futbol.ejs');
-            $this->response->setTemplate("selectLiga.ejs", [
+            $this->response->setTemplate("showLeagueTeams.ejs", [
                 "ligas" => $soccerSeasons
             ]);
 

@@ -1,133 +1,142 @@
 <div class="row">
-    <div class="col l12 m12 x12 s12 center">
-        <img src = "{{APP_SERVICE_PATH}}/images/<%= liga.payload.code %>.png" width="100" />
-        <h1><%= liga.payload.name %></h1>
-
-        <div class="row">
-            <div class="col l6 m6 x6 s6 center">
-                <a href="#!"  onclick="apretaste.send({
-                        command: 'FUTBOL JORNADA',
-                        data: {
-                            payload: liga.payload.id,
-                            matchDay: liga.payload.currentSeason.currentMatchday
-                        }});">Jornada actual</a>
-            </div>
-            <div class="col l6 m6 x6 s6 center">
-                 <a href="#!" class="" onclick="apretaste.send({
-                        command: 'FUTBOL JORNADA',
-                        data: {
-                            payload: liga.payload.id,
-                            matchDay: 'TODAS'
-                        }});">Campeonato</a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
     <div class="col l12 m12 x12 s12">
-        <h2>Posiciones</h2>
+        <div class="card">
+
+            <div class="card-content">
+               <img src = "{{APP_SERVICE_PATH}}/images/<%= liga.payload.code %>.png" width="100" />
+                <h1><%= liga.payload.name %></h1>
+                <div class="row">
+                    <div class="col l6 m6 x6 s6 center">
+                        <a href="#!"  onclick="apretaste.send({
+                                command: 'FUTBOL JORNADA',
+                                data: {
+                                    payload: liga.payload.id,
+                                    matchDay: liga.payload.currentSeason.currentMatchday
+                                }});">Jornada actual</a>
+                    </div>
+                    <div class="col l6 m6 x6 s6 center">
+                         <a href="#!" class="" onclick="apretaste.send({
+                                command: 'FUTBOL JORNADA',
+                                data: {
+                                    payload: liga.payload.id,
+                                    matchDay: 'TODAS'
+                                }});">Campeonato</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-tabs">
+              <ul class="tabs tabs-fixed-width">
+                <li class="tab"><a class="active" href="#positions">Posiciones</a></li>
+                <% if (tipoTorneo !== 'liga') { %>
+                    <li class="tab"><a href="#next">Pr&oacute;xima jornada</a></li>
+                <% } %>
+              </ul>
+            </div>
+
+            <div class="card-content grey lighten-4">
+                <% if (tipoTorneo === 'liga') { %>
+                    <div id="positions">
+                        <div class="row">
+                            <div class="col l12 m12 x12 s12">
+                                <table style="text-align:center" width="100%" class="table">
+                                        <tr>
+                                            <th><h2>#</h2></th>
+                                            <th><h2>Equipo</h2></th>
+                                            <th><h2>Puntos</h2></th>
+                                            <th><h2>PJ</h2></th>
+                                            <th><h2>PG</h2></th>
+                                            <th><h2>PE</h2></th>
+                                            <th><h2>PP</h2></th>
+                                            <th><h2>GF</h2></th>
+                                            <th><h2>GC</h2></th>
+                                            <th><h2>Dif</h2></th>
+                                        </tr>
+                                    <% for(var i = 0; i < posicionesLiga.standings[0].table.length; i++) {
+                                        var position = posicionesLiga.standings[0].table[i]; %>
+                                            <tr>
+                                                <td><%= position.position %></td>
+                                                <td>
+                                                    <a href="#!" onclick="apretaste.send({command: 'FUTBOL EQUIPO',  data: {payload: liga.payload.id, team: '<%= position.team.id %>'}});"><%= position.team.name %></a>
+                                                </td>
+                                                <td><%= position.points %></td>
+                                                <td><%= position.playedGames %></td>
+                                                <td><%= position.won %></td>
+                                                <td><%= position.draw %></td>
+                                                <td><%= position.lost %></td>
+                                                <td><%= position.goalsFor %></td>
+                                                <td><%= position.goalsAgainst %></td>
+                                                <td><%= position.goalDifference %></td>
+                                            </tr>
+                                    <% } %>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="next">
+                        <div class="row">
+                            <div class="col l12 m12 x12 s12">
+                                <table style="text-align:center" width="100%" class="table">
+                                    <tr>
+                                        <th><h2>Local</h2></th>
+                                        <th></th>
+                                        <th><h2>Visitante</h2></th>
+                                        <th><h2>Fecha</h2></th>
+                                    </tr>
+                                    <% for(var i = 0;i < nextFixture.length; i++) {
+                                        var juego = nextFixture[i]; %>
+                                    <tr>
+                                            <td><%= juego.homeTeam.name %></td>
+                                            <td>Vs.</td>
+                                            <td><%= juego.awayTeam.name %></td>
+                                            <td><%= formatDate(juego.utcDate) %></td>
+                                        </tr>
+                                    <% } %>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <div id="positions">
+                        <% for (var i = 0; i < posicionesLiga.standings.lengh; i++) {
+                            var group =  posicionesLiga.standings[i]; %>
+                            <% if (group.type == "TOTAL") { %>
+                                <table style="text-align:center" width="100%" class="table">
+                                    <tr>
+                                        <th colspan="8"><%= group.group %></th>
+                                    </tr>
+                                    <tr>
+                                        <th><h2>#</h2></th>
+                                        <th><h2>Equipo</h2></th>
+                                        <th><h2>PJ</h2></th>
+                                        <th><h2>Puntos</h2></th>
+                                        <th><h2>GF</h2></th>
+                                        <th><h2>GC</h2></th>
+                                        <th><h2>Dif</h2></th>
+                                    </tr>
+                                    <% for(var j=0; j < group.table.length; j++) {
+                                        var team = group.table[i]; %>
+                                    <tr>
+                                        <td><%= team.position %></td>
+                                        <td>
+                                            <a href="#!" onclick="apretaste.send({command: 'FUTBOL EQUIPO',  data: {payload: liga.payload.id, team: '<%= team.id %>'}});"><%= team.name %></a>
+                                        </td>
+                                        <td><%= team.playedGames %></td>
+                                        <td><%= team.points %></td>
+                                        <td><%= team.goalsFor %></td>
+                                        <td><%= team.goalsAgainst %></td>
+                                        <td><%= team.goalDifference %></td>
+                                    </tr>
+                                    <% } %>
+                                </table>
+                            <% } %>
+                        <% }  %>
+                    </div>
+                <% } %>
+            </div>
+          </div>
     </div>
 </div>
-
-<% if (tipoTorneo === 'liga') { %>
-    <div class="row">
-        <div class="col l12 m12 x12 s12">
-            <table style="text-align:center" width="100%" class="table">
-                    <tr>
-                        <th><h2>#</h2></th>
-                        <th><h2>Equipo</h2></th>
-                        <th><h2>Puntos</h2></th>
-                        <th><h2>PJ</h2></th>
-                        <th><h2>PG</h2></th>
-                        <th><h2>PE</h2></th>
-                        <th><h2>PP</h2></th>
-                        <th><h2>GF</h2></th>
-                        <th><h2>GC</h2></th>
-                        <th><h2>Dif</h2></th>
-                    </tr>
-                <% for(var i = 0; i < posicionesLiga.standings[0].table.length; i++) {
-                    var position = posicionesLiga.standings[0].table[i]; %>
-                        <tr>
-                            <td><%= position.position %></td>
-                            <td>
-                                <a href="#!" onclick="apretaste.send({command: 'FUTBOL EQUIPO',  data: {payload: liga.payload.id, team: ' <%= position.team.id %>'}});"><%= position.team.name %></a>
-                            </td>
-                            <td><%= position.points %></td>
-                            <td><%= position.playedGames %></td>
-                            <td><%= position.won %></td>
-                            <td><%= position.draw %></td>
-                            <td><%= position.lost %></td>
-                            <td><%= position.goalsFor %></td>
-                            <td><%= position.goalsAgainst %></td>
-                            <td><%= position.goalDifference %></td>
-                        </tr>
-                <% } %>
-            </table>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col l12 m12 x12 s12">
-            <h2>Próxima jornada</h2>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col l12 m12 x12 s12">
-            <table style="text-align:center" width="100%" class="table">
-                <tr>
-                    <th><h2>Local</h2></th>
-                    <th></th>
-                    <th><h2>Visitante</h2></th>
-                    <th><h2>Fecha</h2></th>
-                </tr>
-                <% for(var i = 0;i < nextFixture.length; i++) {
-                    var juego = nextFixture[i]; %>
-                    <tr>
-                        <td><%= juego.homeTeam.name %></td>
-                        <td>Vs.</td>
-                        <td><%= juego.awayTeam.name %></td>
-                        <td><%= formatDate(juego.utcDate) %></td>
-                    </tr>
-                <% } %>
-            </table>
-        </div>
-    </div>
-<% } else { %>
-    <% for (var i = 0; i < posicionesLiga.standings.lengh; i++) {
-       var group =  posicionesLiga.standings[i]; %>
-        <% if (group.type == "TOTAL") { %>
-            <table style="text-align:center" width="100%" class="table">
-                <tr>
-                    <th colspan="8"><%= group.group %></th>
-                </tr>
-                <tr>
-                    <th><h2>#</h2></th>
-                    <th><h2>Equipo</h2></th>
-                    <th><h2>PJ</h2></th>
-                    <th><h2>Puntos</h2></th>
-                    <th><h2>GF</h2></th>
-                    <th><h2>GC</h2></th>
-                    <th><h2>Dif</h2></th>
-                </tr>
-                <% for(var j=0; j < group.table.length; j++) {
-                   var team = group.table[i]; %>
-                    <tr>
-                        <td><%= team.position %></td>
-                        <td>
-                            <a href="#!" onclick="apretaste.send({command: 'FUTBOL EQUIPO',  data: {payload: liga.payload.id, team: '<%= team.id %>'}});"><%= team.name %></a>
-                        </td>
-                        <td><%= team.playedGames %></td>
-                        <td><%= team.points %></td>
-                        <td><%= team.goalsFor %></td>
-                        <td><%= team.goalsAgainst %></td>
-                        <td><%= team.goalDifference %></td>
-                    </tr>
-                <% } %>
-            </table>
-        <% } %>
-    <% }  %>
-<% } %>
 
 <!-- back floating button -->
 <div class="fixed-action-btn">
