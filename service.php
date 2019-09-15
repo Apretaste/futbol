@@ -97,7 +97,7 @@ class FutbolService extends ApretasteService
         if (empty($this->request->input->data->query)) {
             $this->response->setLayout('futbol.ejs');
             $this->response->setTemplate("selectLiga.ejs", [
-                "ligas" => $soccerSeasons
+                "ligas" => $soccerSeasons->competitions
             ]);
 
             return;
