@@ -81,19 +81,19 @@
                     <div class="col l12 m12 x12 s12">
                         <table style="text-align:center" width="100%" class="table">
                             <tr>
-                                <th><h2>Local</h2></th>
+                                <th><h2 class="center">Local</h2></th>
                                 <th></th>
-                                <th><h2>Visitante</h2></th>
+                                <th><h2 class="center">Visitante</h2></th>
                             </tr>
                             <% for(var i = 0;i < nextFixture.length; i++) {
                                 var juego = nextFixture[i]; %>
-                                <tr colspan="2">
-                                    <td><%= formatDate(juego.utcDate) %></td>
+                                <tr>
+                                    <td colspan="2" class="center"><%= formatDate(juego.utcDate) %></td>
                                 </tr>
                                 <tr>
-                                    <td><%= juego.homeTeam.name %></td>
-                                    <td>Vs.</td>
-                                    <td><%= juego.awayTeam.name %></td>
+                                    <td class="center" colspan="3"><%= juego.homeTeam.name %>
+                                     Vs.
+                                     <%= juego.awayTeam.name %></td>
                                 </tr>
                             <% } %>
                         </table>
