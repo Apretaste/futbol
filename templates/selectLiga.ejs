@@ -2,7 +2,7 @@
 	<div class="col l12 s12 x12">
 	<h1>Ligas de Futbol</h1>
 		<% for(var i = 0; i < ligas.length; i++) { var liga = ligas[i]; %>
-			<h2><<a href="#!" onclick="apretaste.send({command:'FUTBOL LIGA', data:{query: ligas[<%= i %>].id}});">%= liga.name %></a></h2>
+			<h2><<a href="#!" onclick="apretaste.send({command:'FUTBOL LIGA', data:{query: ligas[<%= i %>].id}});"><%= liga.name %></a></h2>
 			  <p><a href = "#!" onclick="apretaste.send({command: 'FUTBOL JORNADA', data: {query: ligas[<%= i %>].id, currentMatchDay: ligas[<%= i %>].currentSeason.currentMatchday}})">Jornada <%= liga.currentSeason.currentMatchday %></a></p>
 		<% } %>
 	</div>
