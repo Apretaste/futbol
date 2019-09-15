@@ -1,13 +1,14 @@
-/*.table{
+.table{
   width: 100%;
   border-collapse: collapse;
 }
 .table td{
   height: 1.5em;
 }
+/*
 .table tr:nth-child(2n){
   background: #e9f4f0;
-}
+}*/
 @media(max-width: 480px){
   .table{
     font-size: 13px;
@@ -16,7 +17,7 @@
     font-size: 1em;
   }
 }
-*/
+
 .card.horizontal .card-image img {
 
   border-radius: 2px 0 0 2px;

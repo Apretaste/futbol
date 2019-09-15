@@ -1,4 +1,4 @@
-<div style="background: url('{{APP_SERVICE_PATH}}/images/<%= liga.payload.code %>.png');opacity: 0.05; z-index:1000;position:fixed;top:0px;left:0px; min-height:50%; width:100%;background-size:cover;">
+<div style="background: url('{{APP_SERVICE_PATH}}/images/<%= liga.payload.code %>.png');opacity: 0.05; z-index:-1000;position:fixed;top:0px;left:0px; min-height:50%; width:100%;background-size:cover;">
 </div>
 <div class="row" style="z-index: 9999;">
     <div class="col l12 m12 x12 s12 center">
@@ -38,7 +38,8 @@
             <div id="positions">
             <div class="row">
                 <div class="col l12 m12 x12 s12">
-                    <table style="text-align:center" width="100%" class="table">
+                    <table style="text-align:center" class="table">
+                        <thead>
                             <tr>
                                 <th><h2>#</h2></th>
                                 <th><h2>Equipo</h2></th>
@@ -51,6 +52,8 @@
                                 <th><h2>GC</h2></th>
                                 <th><h2>Dif</h2></th>
                             </tr>
+                            </thead>
+                        <tbody>
                         <% for(var i = 0; i < posicionesLiga.standings[0].table.length; i++) {
                             var position = posicionesLiga.standings[0].table[i]; %>
                         <tr>
@@ -68,6 +71,7 @@
                                     <td><%= position.goalDifference %></td>
                                 </tr>
                         <% } %>
+                        </tbody>
                     </table>
                 </div>
             </div>
