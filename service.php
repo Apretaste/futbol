@@ -31,7 +31,7 @@ class FutbolService extends ApretasteService
         if (empty($this->request->input->data->query) || (strtolower($this->request->input->data->query) != 'liga') || (strtolower($this->request->input->data->query) != 'jornada') || (strtolower($this->request->input->data->query) != 'equipo')) {
 
             $this->response->setCache();
-
+            $this->response->setLayout('futbol.ejs');
             $this->response->setTemplate("selectLiga.ejs", [
                 "ligas" => $soccerSeasons->competitions
             ]);
@@ -72,7 +72,7 @@ class FutbolService extends ApretasteService
         }
 
         // create the response
-
+        $this->response->setLayout('futbol.ejs');
         $this->response->setTemplate("showLeagueLastResults.ejs", [
             "titulo"  => $response_subject,
             "liga"    => $soccer_season,
@@ -95,7 +95,7 @@ class FutbolService extends ApretasteService
         $soccerSeasons = $apiFD->getSoccerseasons();
 
         if (empty($this->request->input->data->query)) {
-
+            $this->response->setLayout('futbol.ejs');
             $this->response->setTemplate("selectLiga.ejs", [
                 "ligas" => $soccerSeasons
             ]);
@@ -140,7 +140,7 @@ class FutbolService extends ApretasteService
             "posicionesLiga" => $tableLeague,
             "nextFixture"    => $nextFixture
         ];
-
+        $this->response->setLayout('futbol.ejs');
         $this->response->setTemplate("showLeagueInfo.ejs", $responseContent);
     }
 
@@ -157,7 +157,7 @@ class FutbolService extends ApretasteService
         $soccerSeasons = $apiFD->getSoccerseasons();
 
         if (empty($this->request->input->data->query)) {
-
+            $this->response->setLayout('futbol.ejs');
             $this->response->setTemplate("selectLiga.ejs", [
                 "ligas" => $soccerSeasons
             ]);
@@ -181,7 +181,7 @@ class FutbolService extends ApretasteService
         //Get all soccer seasons available
         $soccerSeasons = $apiFD->getSoccerseasons();
         if (empty($this->request->input->data->query)) {
-
+            $this->response->setLayout('futbol.ejs');
             $this->response->setTemplate("selectLiga.ejs", [
                 "ligas" => $soccerSeasons
             ]);
@@ -298,7 +298,7 @@ class FutbolService extends ApretasteService
         $images = [
             "imgTeam" => $imgTeamCacheFile
         ];
-
+        $this->response->setLayout('futbol.ejs');
         $this->response->setTemplate("showLeagueTeams.ejs", $responseContent, $images);
     }
 
