@@ -4,6 +4,8 @@
 	</div>
 </div>
 
+<% console.log(teams) %>
+
 <div class="row">
 	<% teams.forEach(function(team) { %>
 	<div class="col s12">
@@ -14,7 +16,12 @@
 			<div class="card-stacked">
 				<div class="card-content">
 					<span class="card-title grey-text text-darken-4"><%= team.leagueName %></span>
-					<p><img class="flag" src="{{APP_RESOURCES}}/images/flags/<%= team.countryCode %>.png"/> <%= team.countryName %></p>
+					<p>
+						<% if(team.countryCode) { %>
+							<img class="flag" src="{{APP_RESOURCES}}/images/flags/<%= team.countryCode %>.png"/>
+						<% } %>
+						<%= team.countryName %>
+					</p>
 				</div>
 				<div class="card-action">
 					<a href = "#!" onclick="apretaste.send({command: 'FUTBOL RESULTADOS', data: {id:'<%= team.leagueCode %>'}})">Resultados</a>

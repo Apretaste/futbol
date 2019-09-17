@@ -1,10 +1,10 @@
 .flag {
 	width: 20px;
-	height: 10px;
+	height: 11px;
 }
 
 .bottom-space {
-	margin-bottom: 60px;
+	margin-bottom: 65px;
 }
 
 .bg {
@@ -27,4 +27,14 @@
 
 .left {
 	text-align: left !important;
+}
+
+.league-seal {
+	width: 100%;
+	margin-top: 30px;
+}
+
+.head {
+	font-weight: bold;
+	text-align: center;
 }

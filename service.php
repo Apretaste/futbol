@@ -1,5 +1,8 @@
 <?php
 
+// locate dates in Spanish
+setlocale(LC_ALL, "es_ES", 'Spanish_Spain', 'Spanish');
+
 class Service
 {
 	/**
@@ -38,9 +41,9 @@ class Service
 
 		// create content for the view
 		$content = [
-			"league"=>$league,
-			"seasonStart" => $data->season->startDate,
-			"seasonEnd" => $data->season->endDate,
+			"league" => $this->getTeams($league),
+			"seasonStart" => strftime("%e de %b", strtotime($data->season->startDate)),
+			"seasonEnd" => strftime("%e de %b", strtotime($data->season->endDate)),
 			"day" => $data->season->currentMatchday,
 			"standings" => []
 		];
@@ -83,26 +86,27 @@ class Service
 		$uri = "http://api.football-data.org/v2/competitions/$league/matches?status=SCHEDULED&season=$season";
 		$data = $this->api($uri, 'YmdH');
 
+		// create content for the view
+		$content = [
+			"league" => $this->getTeams($league),
+			"matches" => []
+		];
+
 		// format the results for the view
-		$matches = [];
 		foreach ($data->matches as $m) {
 			$match = new StdClass();
-			$match->date = date("M d", strtotime($m->utcDate));
+			$match->date = strftime("%e %b", strtotime($m->utcDate));
 			$match->time = date("g:ia", strtotime($m->utcDate));
 			$match->homeId = $m->homeTeam->id;
 			$match->homeName = $m->homeTeam->name;
 			$match->awayId = $m->awayTeam->id;
 			$match->awayName = $m->awayTeam->name;
-			$matches[] = $match;
+			$content['matches'][] = $match;
 		}
-
-		// sort by date
-		function cmp($a, $b) { return strcmp($b->date.' '.$b->time, $a->date.' '.$a->time); }
-		usort($matches, "cmp");
 
 		// send information to the view
 		$response->setCache('day');
-		$response->setTemplate("siguientes.ejs", ["league"=>$league, "matches"=>$matches]);
+		$response->setTemplate("siguientes.ejs", $content);
 	}
 
 	/**
@@ -122,11 +126,16 @@ class Service
 		$uri = "http://api.football-data.org/v2/competitions/$league/matches?status=FINISHED&season=$season";
 		$data = $this->api($uri, 'YmdH');
 
+		// create content for the view
+		$content = [
+			"league" => $this->getTeams($league),
+			"matches" => []
+		];
+
 		// format the results for the view
-		$matches = [];
 		foreach ($data->matches as $m) {
 			$match = new StdClass();
-			$match->date = date("M d", strtotime($m->utcDate));
+			$match->date = strftime("%e %b", strtotime($m->utcDate));
 			$match->time = date("g:ia", strtotime($m->utcDate));
 			$match->homeId = $m->homeTeam->id;
 			$match->homeName = $m->homeTeam->name;
@@ -134,16 +143,15 @@ class Service
 			$match->awayId = $m->awayTeam->id;
 			$match->awayName = $m->awayTeam->name;
 			$match->awayScore = $m->score->fullTime->awayTeam;
-			$matches[] = $match;
+			$content['matches'][] = $match;
 		}
 
 		// sort by date
-		function cmp($a, $b) { return strcmp($b->date.' '.$b->time, $a->date.' '.$a->time); }
-		usort($matches, "cmp");
+		$content['matches'] = array_reverse($content['matches']);
 
 		// send information to the view
 		$response->setCache('day');
-		$response->setTemplate("resultados.ejs", ["league"=>$league, "matches"=>$matches]);
+		$response->setTemplate("resultados.ejs", $content);
 	}
 
 	/**
@@ -177,10 +185,10 @@ class Service
 			$player = new StdClass();
 			$player->name = $squad->name;
 			$player->number = $squad->shirtNumber;
-			$player->position = $squad->position;
-			$player->dob = date("M d, Y", strtotime($squad->dateOfBirth));
+			$player->position = $this->t($squad->position);
+			$player->dob = strftime("%e/%m/%Y", strtotime($squad->dateOfBirth));
 			$player->country = $squad->countryOfBirth;
-			$player->role = $squad->role;
+			$player->role = ucwords(strtolower(str_replace('_', ' ', $squad->role)));
 			$content['players'][] = $player;
 		}
 
@@ -193,9 +201,10 @@ class Service
 	/**
 	 * Get all available teams 
 	 *
+	 * @param String $code
 	 * @return Array
 	 */
-	private function getTeams()
+	private function getTeams($code=false)
 	{
 		$teams = [];
 
@@ -204,13 +213,15 @@ class Service
 		$team->leagueName = "Primera División Española";
 		$team->countryCode = "es";
 		$team->countryName = "España";
+		if($code == $team->leagueCode) return $team; 
 		$teams[] = $team;
 
 		$team = new StdClass();
 		$team->leagueCode = "CL";
 		$team->leagueName = "UEFA Champions League";
-		$team->countryCode = "eu";
+		$team->countryCode = "";
 		$team->countryName = "Europa";
+		if($code == $team->leagueCode) return $team; 
 		$teams[] = $team;
 
 		$team = new StdClass();
@@ -218,6 +229,7 @@ class Service
 		$team->leagueName = "Premier League";
 		$team->countryCode = "gb";
 		$team->countryName = "England";
+		if($code == $team->leagueCode) return $team; 
 		$teams[] = $team;
 
 		$team = new StdClass();
@@ -225,6 +237,7 @@ class Service
 		$team->leagueName = "Bundesliga";
 		$team->countryCode = "de";
 		$team->countryName = "Alemania";
+		if($code == $team->leagueCode) return $team; 
 		$teams[] = $team;
 
 		$team = new StdClass();
@@ -232,6 +245,7 @@ class Service
 		$team->leagueName = "Eredivisie";
 		$team->countryCode = "nl";
 		$team->countryName = "Holanda";
+		if($code == $team->leagueCode) return $team; 
 		$teams[] = $team;
 
 		$team = new StdClass();
@@ -239,6 +253,7 @@ class Service
 		$team->leagueName = "French League One";
 		$team->countryCode = "fr";
 		$team->countryName = "Francia";
+		if($code == $team->leagueCode) return $team; 
 		$teams[] = $team;
 
 		$team = new StdClass();
@@ -246,6 +261,7 @@ class Service
 		$team->leagueName = "Portugal Primeira Liga";
 		$team->countryCode = "pt";
 		$team->countryName = "Portugal";
+		if($code == $team->leagueCode) return $team; 
 		$teams[] = $team;
 
 		$team = new StdClass();
@@ -253,6 +269,7 @@ class Service
 		$team->leagueName = "English Football League Two";
 		$team->countryCode = "gb";
 		$team->countryName = "United Kingdom";
+		if($code == $team->leagueCode) return $team; 
 		$teams[] = $team;
 
 		$team = new StdClass();
@@ -260,6 +277,7 @@ class Service
 		$team->leagueName = "Serie A";
 		$team->countryCode = "it";
 		$team->countryName = "Italia";
+		if($code == $team->leagueCode) return $team;
 		$teams[] = $team;
 
 		$team = new StdClass();
@@ -267,9 +285,30 @@ class Service
 		$team->leagueName = "Brasileiro Serie A";
 		$team->countryCode = "br";
 		$team->countryName = "Brasil";
+		if($code == $team->leagueCode) return $team; 
 		$teams[] = $team;
 
 		return $teams;
+	}
+
+	/**
+	 * Translate to Spanish
+	 *
+	 * @param String $word
+	 * @return String
+	 */
+	private function t($word)
+	{
+		// array to translate to Spanish
+		$sp = [
+			"Goalkeeper" => "Portero", 
+			"Defender" => "Defensa", 
+			"Midfielder" => "Centrocampo",
+			"Attacker" => "Delantero",
+		];
+
+		// return word or empty
+		return isset($sp[$word]) ? $sp[$word] : "";
 	}
 
 	/**

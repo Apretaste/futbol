@@ -1,6 +1,6 @@
 <div class="row">
 	<div class="col s12 center">
-		<img src="{{APP_SERVICE_PATH}}/images/<%= picture %>">
+		<img src="{{APP_IMAGE_PATH}}<%= picture %>">
 		<h1><%= name %></h1>
 		<p>
 			Fundado en <%= founded %><br>
@@ -25,13 +25,17 @@
 					<td>
 						<%= player.name %><br>
 
-						<% if(player.role != "PLAYER") { %>
+						<% if(player.role != "Player") { %>
 							<%= player.role %>
 						<% } else { %>
-							<b>#<%= player.number %></b> <%= player.position %></td>
+							<% if(player.number) { %>
+								<b>#<%= player.number %></b>
+							<% } %>
+							<%= player.position %></td>
 						<% } %>
 					<td>
-						<%= player.dob %><br><%= player.country %>
+						<%= player.dob %><br>
+						<%= player.country %>
 					</td>
 				</tr>
 				<% }) %>
