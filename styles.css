@@ -1,34 +1,30 @@
-body {
-  font-weight: bold;
+.flag {
+	width: 20px;
+	height: 10px;
 }
 
-.table{
-  width: 100%;
-  border-collapse: collapse;
-}
-.table td{
-  height: 1.5em;
-}
-/*
-.table tr:nth-child(2n){
-  background: #e9f4f0;
-}*/
-@media(max-width: 480px){
-  .table{
-    font-size: 13px;
-  }
-  .table h2{
-    font-size: 1em;
-  }
+.bottom-space {
+	margin-bottom: 60px;
 }
 
-.card.horizontal .card-image img {
-
-  border-radius: 2px 0 0 2px;
-  width: 100px;
-  margin: 10px;
+.bg {
+	height: 100%;
+	width: 100%;
+	z-index: -1000;
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	opacity: 0.1;
+	background-repeat: no-repeat;
+	background-position: center center;
 }
 
-ul.tabs {
-  background: none;
+.card-image img {
+	width: 100px;
+	height: 100px;
+	margin: 20px;
+}
+
+.left {
+	text-align: left !important;
 }

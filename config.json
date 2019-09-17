@@ -1,7 +1,7 @@
 {
 	"name": "futbol",
-	"version": "1",
-	"description": "Consulta y muestra resultados de algunos torneos importantes de futbol",
+	"version": 1,
+	"description": "Muestra los resultados de los torneos más importantes de futbol",
 	"category": "ocio",
 	"creator": "kumahacker@gmail.com",
 	"listed": true

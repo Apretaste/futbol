@@ -1,339 +1,306 @@
 <?php
 
-include __DIR__.'/models/FootballData.php';
-
-/**
- * Futbol Service
- *
- * @author  Kuma [@kumahacker] <kumahavana@gmail.com>
- * @version 3.0
- */
-class FutbolService extends ApretasteService
+class Service
 {
+	/**
+	 * Display the list of leagues
+	 *
+	 * @author salvipascual
+	 * @param Request
+	 * @param Response
+	 */
+	public function _main (Request $request, Response $response)
+	{
+		// get all opened leagues
+		$teams = $this->getTeams();
 
-    public $apiFD = null;
+		// send information to the view
+		$response->setCache();
+		$response->setTemplate("home.ejs", ["teams"=>$teams]);
+	}
 
-    public $soccerSeasons = null; // Get all soccer seasons available
+	/**
+	 * Muestra las posiciones dentro de una liga
+	 *
+	 * @author salvipascual
+	 * @param Request
+	 * @param Response
+	 */
+	public function _marcador (Request $request, Response $response)
+	{
+		// pull the league
+		$league = $request->input->data->id;
+		$season = date('Y');
 
-    /**
-     * Function executed when the service is called
-     *
-     * @param Request
-     *
-     **/
-    public function _main()
-    {
-        $apiFD = new FootballData();
+		// get data online
+		$uri = "http://api.football-data.org/v2/competitions/$league/standings?season=$season";
+		$data = $this->api($uri, 'YmdH');
 
-        // Get all soccer seasons available
-        $soccerSeasons = $apiFD->getSoccerseasons();
+		// create content for the view
+		$content = [
+			"league"=>$league,
+			"seasonStart" => $data->season->startDate,
+			"seasonEnd" => $data->season->endDate,
+			"day" => $data->season->currentMatchday,
+			"standings" => []
+		];
 
-        if (empty($this->request->input->data->query) || (strtolower($this->request->input->data->query) != 'liga') || (strtolower($this->request->input->data->query) != 'jornada') || (strtolower($this->request->input->data->query) != 'equipo')) {
+		// format the results for the view
+		foreach ($data->standings[0]->table as $std) {
+			$standing = new StdClass();
+			$standing->position = $std->position;
+			$standing->teamId = $std->team->id;
+			$standing->teamName = $std->team->name;
+			$standing->won = $std->won;
+			$standing->draw = $std->draw;
+			$standing->lost = $std->lost;
+			$standing->points = $std->points;
+			$standing->goalsFor = $std->goalsFor;
+			$standing->goalsAgainst = $std->goalsAgainst;
+			$standing->goalDiff = $std->goalDifference;
+			$content['standings'][] = $standing;
+		}
 
-            $this->response->setCache();
-            $this->response->setLayout('futbol.ejs');
-            $this->response->setTemplate("selectLiga.ejs", [
-                "ligas" => $soccerSeasons->competitions
-            ]);
+		// send information to the view
+		$response->setCache('day');
+		$response->setTemplate("marcador.ejs", $content);
+	}
 
-        }
-    }
+	/**
+	 * Muestra los proximos juegos de una liga
+	 *
+	 * @author salvipascual
+	 * @param Request
+	 * @param Response
+	 */
+	public function _siguientes (Request $request, Response $response)
+	{
+		// pull the league
+		$league = $request->input->data->id;
+		$season = date('Y');
 
-    /**
-     * Search a journey by id
-     *
-     * @param $query
-     * @param $apiFD
-     *
-     */
-    private function searchJourneyById($query, $apiFD)
-    {
-        $query_data = explode(" ", $query);
-        $id_league = $query_data[0];
-        $journey = 1;
+		// get data online
+		$uri = "http://api.football-data.org/v2/competitions/$league/matches?status=SCHEDULED&season=$season";
+		$data = $this->api($uri, 'YmdH');
 
-        if (isset($this->request->input->data->matchDay)) {
-            $journey = $this->request->input->data->matchDay;
-        }
+		// format the results for the view
+		$matches = [];
+		foreach ($data->matches as $m) {
+			$match = new StdClass();
+			$match->date = date("M d", strtotime($m->utcDate));
+			$match->time = date("g:ia", strtotime($m->utcDate));
+			$match->homeId = $m->homeTeam->id;
+			$match->homeName = $m->homeTeam->name;
+			$match->awayId = $m->awayTeam->id;
+			$match->awayName = $m->awayTeam->name;
+			$matches[] = $match;
+		}
 
-        $soccer_season = $apiFD->getSoccerseasonById($id_league);
+		// sort by date
+		function cmp($a, $b) { return strcmp($b->date.' '.$b->time, $a->date.' '.$a->time); }
+		usort($matches, "cmp");
 
-        if (is_null($soccer_season)) {
+		// send information to the view
+		$response->setCache('day');
+		$response->setTemplate("siguientes.ejs", ["league"=>$league, "matches"=>$matches]);
+	}
 
-            $this->simpleMessage(
-                "No encontramos informacion de la liga en estos momentos.",
-                "No encontramos informaci&oacute;n de la liga en estos momentos. Por favor intente m&aacute;s tarde.");
+	/**
+	 * Muestra los resultados de la liga hasta ahora
+	 *
+	 * @author salvipascual
+	 * @param Request
+	 * @param Response
+	 */
+	public function _resultados (Request $request, Response $response)
+	{
+		// pull the league
+		$league = $request->input->data->id;
+		$season = date('Y');
 
-            return;
-        }
+		// get data online
+		$uri = "http://api.football-data.org/v2/competitions/$league/matches?status=FINISHED&season=$season";
+		$data = $this->api($uri, 'YmdH');
 
-        if (strtoupper($journey) == "TODAS") {
-            $fixture = $soccer_season->getAllFixtures();
+		// format the results for the view
+		$matches = [];
+		foreach ($data->matches as $m) {
+			$match = new StdClass();
+			$match->date = date("M d", strtotime($m->utcDate));
+			$match->time = date("g:ia", strtotime($m->utcDate));
+			$match->homeId = $m->homeTeam->id;
+			$match->homeName = $m->homeTeam->name;
+			$match->homeScore = $m->score->fullTime->homeTeam;
+			$match->awayId = $m->awayTeam->id;
+			$match->awayName = $m->awayTeam->name;
+			$match->awayScore = $m->score->fullTime->awayTeam;
+			$matches[] = $match;
+		}
 
-            $response_subject = "Todos los resultados de la ".$soccer_season->payload->name;
-        } else {
-            $fixture = $soccer_season->getFixturesByMatchday($journey);
-            $response_subject = $soccer_season->payload->name."<br/>Jornada {$journey}";
-        }
+		// sort by date
+		function cmp($a, $b) { return strcmp($b->date.' '.$b->time, $a->date.' '.$a->time); }
+		usort($matches, "cmp");
 
-        // create the response
-        $this->response->setLayout('futbol.ejs');
-        $this->response->setTemplate("showLeagueLastResults.ejs", [
-            "titulo"  => $response_subject,
-            "liga"    => $soccer_season,
-            "jornada" => $journey,
-            "fixture" => $fixture
-        ]);
-    }
+		// send information to the view
+		$response->setCache('day');
+		$response->setTemplate("resultados.ejs", ["league"=>$league, "matches"=>$matches]);
+	}
 
-    /**
-     * Subservice LIGA
-     *
-     * @param \Request $request
-     *
-     */
-    public function _liga()
-    {
-        $apiFD = new FootballData();
+	/**
+	 * Muestra detalles del equipo de una liga 
+	 *
+	 * @author salvipascual
+	 * @param Request
+	 * @param Response
+	 */
+	public function _equipo (Request $request, Response $response)
+	{
+		// pull the team
+		$team = $request->input->data->id;
 
-        // Get all soccer seasons available
-        $soccerSeasons = $apiFD->getSoccerseasons();
+		// get data online
+		$uri = "http://api.football-data.org/v2/teams/$team";
+		$data = $this->api($uri);
 
-        if (empty($this->request->input->data->query)) {
-            $this->response->setLayout('futbol.ejs');
-            $this->response->setTemplate("selectLiga.ejs", [
-                "ligas" => $soccerSeasons->competitions
-            ]);
+		// create content for the view
+		$content = [
+			"name" => $data->name,
+			"area" => $data->area->name,
+			"picture" => basename($data->crestUrl),
+			"founded" => $data->founded,
+			"venue" => $data->venue,
+			"players" => []
+		];
 
-            return;
-        } else {
-            $this->searchInfoLeagueById($this->request->input->data->query, $apiFD);
-        }
-    }
+		// get team players
+		foreach ($data->squad as $squad) {
+			$player = new StdClass();
+			$player->name = $squad->name;
+			$player->number = $squad->shirtNumber;
+			$player->position = $squad->position;
+			$player->dob = date("M d, Y", strtotime($squad->dateOfBirth));
+			$player->country = $squad->countryOfBirth;
+			$player->role = $squad->role;
+			$content['players'][] = $player;
+		}
 
-    /**
-     * Search information about league
-     *
-     * @param $query
-     * @param $apiFD
-     *
-     */
-    private function searchInfoLeagueById($query, $apiFD)
-    {
-        $soccerseason = $apiFD->getSoccerseasonById($query);
+		// send information to the view
+		$response->setCache();
+		$response->setTemplate("equipo.ejs", $content, [$data->crestUrl]);
+	}
 
-        if (is_null($soccerseason)) {
 
-            $this->response->setResponseSubject();
-            $this->simpleMessage(
-                "No encontramos informacion de la liga en estos momentos.",
-                "No encontramos informaci&oacute;n de la liga en estos momentos. Por favor intente m&aacute;s tarde.");
+	/**
+	 * Get all available teams 
+	 *
+	 * @return Array
+	 */
+	private function getTeams()
+	{
+		$teams = [];
 
-            return;
-        }
+		$team = new StdClass();
+		$team->leagueCode = "PD";
+		$team->leagueName = "Primera División Española";
+		$team->countryCode = "es";
+		$team->countryName = "España";
+		$teams[] = $team;
 
-        $tableLeague = $soccerseason->getLeagueTable();
-        $tipoTorneo = ($tableLeague->standings[0]->stage == "GROUP_STAGE") ? 'copa' : 'liga';
-        $currentMatchday = $soccerseason->payload->currentSeason->currentMatchday;
-        //$numberOfMatchdays = $soccerseason->payload->numberOfMatchdays;
-        //$nextMatchday      = ($currentMatchday < $numberOfMatchdays) ? ($currentMatchday + 1) : $numberOfMatchdays;
-        $nextFixture = $soccerseason->getFixturesByMatchday($currentMatchday + 1);
-        // create a json object to send to the template
-        $responseContent = [
-            "tipoTorneo"     => $tipoTorneo,
-            "liga"           => $soccerseason,
-            "posicionesLiga" => $tableLeague,
-            "nextFixture"    => $nextFixture
-        ];
-        $this->response->setLayout('futbol.ejs');
-        $this->response->setTemplate("showLeagueInfo.ejs", $responseContent);
-    }
+		$team = new StdClass();
+		$team->leagueCode = "CL";
+		$team->leagueName = "UEFA Champions League";
+		$team->countryCode = "eu";
+		$team->countryName = "Europa";
+		$teams[] = $team;
 
-    /**
-     * Subservice JORNADA
-     *
-     * @param \Request $request
-     */
-    public function _jornada()
-    {
-        $apiFD = new FootballData();
+		$team = new StdClass();
+		$team->leagueCode = "PL";
+		$team->leagueName = "Premier League";
+		$team->countryCode = "gb";
+		$team->countryName = "England";
+		$teams[] = $team;
 
-        //Get all soccer seasons available
-        $soccerSeasons = $apiFD->getSoccerseasons();
+		$team = new StdClass();
+		$team->leagueCode = "BL1";
+		$team->leagueName = "Bundesliga";
+		$team->countryCode = "de";
+		$team->countryName = "Alemania";
+		$teams[] = $team;
 
-        if (empty($this->request->input->data->query)) {
-            $this->response->setLayout('futbol.ejs');
-            $this->response->setTemplate("selectLiga.ejs", [
-                "ligas" => $soccerSeasons->competitions
-            ]);
+		$team = new StdClass();
+		$team->leagueCode = "DED";
+		$team->leagueName = "Eredivisie";
+		$team->countryCode = "nl";
+		$team->countryName = "Holanda";
+		$teams[] = $team;
 
-            return;
-        }
+		$team = new StdClass();
+		$team->leagueCode = "FL1";
+		$team->leagueName = "French League One";
+		$team->countryCode = "fr";
+		$team->countryName = "Francia";
+		$teams[] = $team;
 
-        $this->searchJourneyById($this->request->input->data->query, $apiFD);
-    }
+		$team = new StdClass();
+		$team->leagueCode = "PPL";
+		$team->leagueName = "Portugal Primeira Liga";
+		$team->countryCode = "pt";
+		$team->countryName = "Portugal";
+		$teams[] = $team;
 
-    /**
-     * Subservice EQUIPO
-     *
-     * @param \Request $request
-     *
-     */
-    public function _equipo()
-    {
-        $apiFD = new FootballData();
+		$team = new StdClass();
+		$team->leagueCode = "EFL";
+		$team->leagueName = "English Football League Two";
+		$team->countryCode = "gb";
+		$team->countryName = "United Kingdom";
+		$teams[] = $team;
 
-        //Get all soccer seasons available
-        $soccerSeasons = $apiFD->getSoccerseasons();
-        if (empty($this->request->input->data->query)) {
-            $this->response->setLayout('futbol.ejs');
-            $this->response->setTemplate("showLeagueTeams.ejs", [
-                "ligas" => $soccerSeasons
-            ]);
+		$team = new StdClass();
+		$team->leagueCode = "SA";
+		$team->leagueName = "Serie A";
+		$team->countryCode = "it";
+		$team->countryName = "Italia";
+		$teams[] = $team;
 
-            return;
-        }
+		$team = new StdClass();
+		$team->leagueCode = "BSA";
+		$team->leagueName = "Brasileiro Serie A";
+		$team->countryCode = "br";
+		$team->countryName = "Brasil";
+		$teams[] = $team;
 
-        $this->searchTeamById($this->request->input->data->query, $apiFD);
-    }
+		return $teams;
+	}
 
-    /**
-     * Search team by ID
-     *
-     * @param $query
-     * @param $apiFD
-     */
-    private function searchTeamById($query, $apiFD)
-    {
-        $query_data = explode(" ", $query);
-        $id_league = $query_data[0];
-        $equipo = $query_data[1];
-        $soccer_season = $apiFD->getSoccerseasonById($id_league);
+	/**
+	 * Access remote content
+	 *
+	 * @param String $uri
+	 * @param String $date
+	 * @return Array
+	 */
+	private function api($uri, $date="Y")
+	{
+		// load from cache if exists
+		$cache = Utils::getTempDir() . date($date) . "_" . md5($uri) . ".tmp";
+		if(file_exists($cache)) $data = unserialize(file_get_contents($cache));
 
-        if (is_null($soccer_season)) {
+		// get from the internet
+		else {
+			// get the token
+			$token = 'b8044b406aca4851ac7ceeea79fccaea';
 
-            $this->simpleMessage(
-                "No encontramos informacion de la liga en estos momentos.",
-                "No encontramos informaci&oacute;n de la liga en estos momentos. Por favor intente m&aacute;s tarde.");
+			// access the api
+			$reqPrefs['http']['method'] = "GET";
+			$reqPrefs['http']['header'] = "X-Auth-Token: $token";
+			$context = stream_context_create($reqPrefs);
+			$data = json_decode(file_get_contents($uri, false, $context));
 
-            return;
-        }
+			// save cache file
+			file_put_contents($cache, serialize($data));
+		}
 
-        $equipos = null;
-        $fixturesHome = null;
-        $fixturesAway = null;
-        $players = null;
-        $imgTeamCacheFile = null;
-
-        if (strtoupper($equipo) == "TODOS") {
-            $equipos = $soccer_season->getTeams();
-            $textoAsunto = "Equipos que compiten en la ".$soccer_season->payload->name;
-
-        } else {
-            /*$teamName = substr($query, 4);
-            // search for desired team
-            $searchQuery = $apiFD->searchTeam(urlencode($teamName));
-
-            if( ! isset($searchQuery->teams[0]->id))
-            {
-                
-                $this->response->setResponseSubject("Equipo no encontrado");
-                $this->response->createFromText("No encontramos el equipo que buscabas");
-
-                return;
-            }*/
-
-            $equipos = $apiFD->getTeamById($equipo);
-            $fixturesHome = $equipos->getFixtures('HOME')->matches;
-            $fixturesAway = $equipos->getFixtures('AWAY')->matches;
-            //$players       = $equipos->getPlayers();
-
-            $imgTeamSource = $equipos->_payload->crestUrl;
-            $extension = substr($imgTeamSource, -4);
-
-            $di = \Phalcon\DI\FactoryDefault::getDefault();
-            $wwwroot = $di->get('path')['root'];
-            $imgTeamCacheFile = "$wwwroot/temp/"."team_".$id_league."_".$equipo."_logoCacheFile.svg";
-
-            if (!file_exists($imgTeamCacheFile)) {
-
-                $imgTeamSource = $this->file_get_contents_curl($imgTeamSource);
-                if ($imgTeamSource != false) {
-                    if (strtolower($extension) == '.svg') {
-                        file_put_contents($imgTeamCacheFile, $imgTeamSource);
-                        /*$image = new Imagick();
-                        $image->readImageBlob($imgTeamSource); //imagen svg
-                        $image->setImageFormat("png24");
-                        $image->resizeImage(1024, 768, imagick::FILTER_LANCZOS, 1);
-                        $image->writeImage($imgTeamCacheFile); //imagen png*/
-                    } else {
-                        file_put_contents($imgTeamCacheFile, $imgTeamSource);
-                    }
-                }
-
-                /*else
-                {
-                    $image  = new Imagick();
-                    $dibujo = new ImagickDraw();
-                    $dibujo->setFontSize(30);
-
-                    $image->newImage(100, 100, new ImagickPixel('#d3d3d3')); 
-                    $image->annotateImage($dibujo, 10, 45, 0, ' 404!');
-                    $image->setImageFormat("png24");
-                    $image->resizeImage(1024, 768, imagick::FILTER_LANCZOS, 1);
-                    $image->writeImage($imgTeamCacheFile);
-                }*/
-            }
-            $textoAsunto = "Datos del ".$equipos->_payload->name;
-        }
-
-        // create a json object to send to the template
-        $responseContent = [
-            "titulo"     => $textoAsunto,
-            "liga"       => $soccer_season,
-            "equipo"     => $equipo,
-            "equipos"    => $equipos,
-            "juegosHome" => $fixturesHome,
-            "juegosAway" => $fixturesAway,
-            "jugadores"  => $players,
-            "imgTeam"    => $imgTeamCacheFile
-        ];
-
-        // get the images to embed into the email
-        $images = [
-            "imgTeam" => $imgTeamCacheFile
-        ];
-        $this->response->setLayout('futbol.ejs');
-        $this->response->setTemplate("showLeagueTeams.ejs", $responseContent, $images);
-    }
-
-    /**
-     * @param $url
-     *
-     * @return bool|string
-     */
-    private function file_get_contents_curl($url)
-    {
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); //Set curl to return the data instead of printing it to the browser.
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            "X-Auth-Token:b8044b406aca4851ac7ceeea79fccaea"
-        ]);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-        curl_setopt($ch, CURLOPT_URL, $url);
-        $data = curl_exec($ch);
-        /* Check for 404 (file not found). */
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        if ($httpCode == 404) {
-            /* Handle 404 here. */
-            $data = false;
-        }
-        curl_close($ch);
-
-        return $data;
-    }
+		// return data
+		return $data;
+	}
 }
