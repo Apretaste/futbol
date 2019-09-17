@@ -38,3 +38,7 @@
 	font-weight: bold;
 	text-align: center;
 }
+
+ul.tabs {
+	background-color: transparent;
+}

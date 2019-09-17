@@ -174,7 +174,6 @@ class Service
 		$content = [
 			"name" => $data->name,
 			"area" => $data->area->name,
-			"picture" => basename($data->crestUrl),
 			"founded" => $data->founded,
 			"venue" => $data->venue,
 			"players" => []
@@ -194,7 +193,7 @@ class Service
 
 		// send information to the view
 		$response->setCache();
-		$response->setTemplate("equipo.ejs", $content, [$data->crestUrl]);
+		$response->setTemplate("equipo.ejs", $content);
 	}
 
 
