@@ -152,10 +152,12 @@ class Service
 		// send information to the view
 		$response->setCache('day');
 		$response->setTemplate("resultados.ejs", $content);
+
+		Challenges::complete("view-futbol", $request->person->id);
 	}
 
 	/**
-	 * Muestra detalles del equipo de una liga 
+	 * Muestra detalles del equipo de una liga
 	 *
 	 * @author salvipascual
 	 * @param Request
@@ -198,7 +200,7 @@ class Service
 
 
 	/**
-	 * Get all available teams 
+	 * Get all available teams
 	 *
 	 * @param String $code
 	 * @return Array
@@ -212,7 +214,7 @@ class Service
 		$team->leagueName = "Primera División Española";
 		$team->countryCode = "es";
 		$team->countryName = "España";
-		if($code == $team->leagueCode) return $team; 
+		if($code == $team->leagueCode) return $team;
 		$teams[] = $team;
 
 		$team = new StdClass();
@@ -220,7 +222,7 @@ class Service
 		$team->leagueName = "UEFA Champions League";
 		$team->countryCode = "";
 		$team->countryName = "Europa";
-		if($code == $team->leagueCode) return $team; 
+		if($code == $team->leagueCode) return $team;
 		$teams[] = $team;
 
 		$team = new StdClass();
@@ -228,7 +230,7 @@ class Service
 		$team->leagueName = "Premier League";
 		$team->countryCode = "gb";
 		$team->countryName = "England";
-		if($code == $team->leagueCode) return $team; 
+		if($code == $team->leagueCode) return $team;
 		$teams[] = $team;
 
 		$team = new StdClass();
@@ -236,7 +238,7 @@ class Service
 		$team->leagueName = "Bundesliga";
 		$team->countryCode = "de";
 		$team->countryName = "Alemania";
-		if($code == $team->leagueCode) return $team; 
+		if($code == $team->leagueCode) return $team;
 		$teams[] = $team;
 
 		$team = new StdClass();
@@ -244,7 +246,7 @@ class Service
 		$team->leagueName = "Eredivisie";
 		$team->countryCode = "nl";
 		$team->countryName = "Holanda";
-		if($code == $team->leagueCode) return $team; 
+		if($code == $team->leagueCode) return $team;
 		$teams[] = $team;
 
 		$team = new StdClass();
@@ -252,7 +254,7 @@ class Service
 		$team->leagueName = "French League One";
 		$team->countryCode = "fr";
 		$team->countryName = "Francia";
-		if($code == $team->leagueCode) return $team; 
+		if($code == $team->leagueCode) return $team;
 		$teams[] = $team;
 
 		$team = new StdClass();
@@ -260,7 +262,7 @@ class Service
 		$team->leagueName = "Portugal Primeira Liga";
 		$team->countryCode = "pt";
 		$team->countryName = "Portugal";
-		if($code == $team->leagueCode) return $team; 
+		if($code == $team->leagueCode) return $team;
 		$teams[] = $team;
 
 		$team = new StdClass();
@@ -268,7 +270,7 @@ class Service
 		$team->leagueName = "English Football League Two";
 		$team->countryCode = "gb";
 		$team->countryName = "United Kingdom";
-		if($code == $team->leagueCode) return $team; 
+		if($code == $team->leagueCode) return $team;
 		$teams[] = $team;
 
 		$team = new StdClass();
@@ -284,7 +286,7 @@ class Service
 		$team->leagueName = "Brasileiro Serie A";
 		$team->countryCode = "br";
 		$team->countryName = "Brasil";
-		if($code == $team->leagueCode) return $team; 
+		if($code == $team->leagueCode) return $team;
 		$teams[] = $team;
 
 		return $teams;
@@ -300,8 +302,8 @@ class Service
 	{
 		// array to translate to Spanish
 		$sp = [
-			"Goalkeeper" => "Portero", 
-			"Defender" => "Defensa", 
+			"Goalkeeper" => "Portero",
+			"Defender" => "Defensa",
 			"Midfielder" => "Centrocampo",
 			"Attacker" => "Delantero",
 		];
