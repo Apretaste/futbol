@@ -1,5 +1,9 @@
 <?php
 
+use Apretaste\Request;
+use Apretaste\Response;
+use Apretaste\Challenges;
+
 // locate dates in Spanish
 setlocale(LC_ALL, "es_ES", 'Spanish_Spain', 'Spanish');
 
@@ -8,11 +12,13 @@ class Service
 	/**
 	 * Display the list of leagues
 	 *
+	 * @param \Apretaste\Request  $request
+	 * @param \Apretaste\Response $response
+	 *
+	 * @throws \Framework\Alert
 	 * @author salvipascual
-	 * @param Request
-	 * @param Response
 	 */
-	public function _main (Request $request, Response $response)
+	public function _main (Request $request, Response &$response)
 	{
 		// get all opened leagues
 		$teams = $this->getTeams();
@@ -26,10 +32,11 @@ class Service
 	 * Muestra las posiciones dentro de una liga
 	 *
 	 * @author salvipascual
-	 * @param Request
-	 * @param Response
+	 * @param \Apretaste\Request  $request
+	 * @param \Apretaste\Response $response
+	 * @throws \Framework\Alert
 	 */
-	public function _marcador (Request $request, Response $response)
+	public function _marcador (Request $request, Response &$response)
 	{
 		// pull the league
 		$league = $request->input->data->id;
@@ -73,10 +80,11 @@ class Service
 	 * Muestra los proximos juegos de una liga
 	 *
 	 * @author salvipascual
-	 * @param Request
-	 * @param Response
+	 * @param \Apretaste\Request  $request
+	 * @param \Apretaste\Response $response
+	 * @throws \Framework\Alert
 	 */
-	public function _siguientes (Request $request, Response $response)
+	public function _siguientes (Request $request, Response &$response)
 	{
 		// pull the league
 		$league = $request->input->data->id;
@@ -113,10 +121,11 @@ class Service
 	 * Muestra los resultados de la liga hasta ahora
 	 *
 	 * @author salvipascual
-	 * @param Request
-	 * @param Response
+	 * @param \Apretaste\Request  $request
+	 * @param \Apretaste\Response $response
+	 * @throws \Framework\Alert
 	 */
-	public function _resultados (Request $request, Response $response)
+	public function _resultados (Request $request, Response &$response)
 	{
 		// pull the league
 		$league = $request->input->data->id;
@@ -160,10 +169,11 @@ class Service
 	 * Muestra detalles del equipo de una liga
 	 *
 	 * @author salvipascual
-	 * @param Request
-	 * @param Response
+	 * @param \Apretaste\Request  $request
+	 * @param \Apretaste\Response $response
+	 * @throws \Framework\Alert
 	 */
-	public function _equipo (Request $request, Response $response)
+	public function _equipo (Request $request, Response &$response)
 	{
 		// pull the team
 		$team = $request->input->data->id;
@@ -322,7 +332,7 @@ class Service
 	private function api($uri, $date="Y")
 	{
 		// load from cache if exists
-		$cache = Utils::getTempDir() . date($date) . "_" . md5($uri) . ".tmp";
+		$cache = TEMP_PATH . date($date) . "_" . md5($uri) . ".tmp";
 		if(file_exists($cache)) $data = unserialize(file_get_contents($cache));
 
 		// get from the internet
