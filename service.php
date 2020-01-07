@@ -93,7 +93,7 @@ class Service
 		];
 
 		// format the results for the view
-		foreach ($data->matches as $m) {
+		if (is_array($data->matches)) foreach ($data->matches as $m) {
 			$match = new StdClass();
 			$match->date = strftime("%e %b", strtotime($m->utcDate));
 			$match->time = date("g:ia", strtotime($m->utcDate));
@@ -133,7 +133,7 @@ class Service
 		];
 
 		// format the results for the view
-		foreach ($data->matches as $m) {
+		if (is_array($data->matches)) foreach ($data->matches as $m) {
 			$match = new StdClass();
 			$match->date = strftime("%e %b", strtotime($m->utcDate));
 			$match->time = date("g:ia", strtotime($m->utcDate));
