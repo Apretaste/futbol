@@ -328,7 +328,7 @@ class Service
 		// get from the internet
 		else {
 			// get the token
-			$token = 'b8044b406aca4851ac7ceeea79fccaea';
+			$token = 'd08dda4df1954b9781e83bd7fedc20c3';
 
 			// access the api
 			$reqPrefs['http']['method'] = "GET";
