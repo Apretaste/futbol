@@ -92,10 +92,8 @@ class Service
 			"matches" => []
 		];
 
-		if (!is_object($data)) return $data;
-
 		// format the results for the view
-		if (is_array($data->matches)) foreach ($data->matches as $m) {
+		if (is_object($data)) if (is_array($data->matches)) foreach ($data->matches as $m) {
 			$match = new StdClass();
 			$match->date = strftime("%e %b", strtotime($m->utcDate));
 			$match->time = date("g:ia", strtotime($m->utcDate));
@@ -134,10 +132,8 @@ class Service
 			"matches" => []
 		];
 
-		if (!is_object($data)) return $data;
-
 		// format the results for the view
-		if (is_array($data->matches)) foreach ($data->matches as $m) {
+		if (is_object($data)) if (is_array($data->matches)) foreach ($data->matches as $m) {
 			$match = new StdClass();
 			$match->date = strftime("%e %b", strtotime($m->utcDate));
 			$match->time = date("g:ia", strtotime($m->utcDate));
