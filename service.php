@@ -92,6 +92,8 @@ class Service
 			"matches" => []
 		];
 
+		if (!is_object($data)) return $data;
+
 		// format the results for the view
 		if (is_array($data->matches)) foreach ($data->matches as $m) {
 			$match = new StdClass();
@@ -131,6 +133,8 @@ class Service
 			"league" => $this->getTeams($league),
 			"matches" => []
 		];
+
+		if (!is_object($data)) return $data;
 
 		// format the results for the view
 		if (is_array($data->matches)) foreach ($data->matches as $m) {
