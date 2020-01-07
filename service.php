@@ -323,19 +323,23 @@ class Service
 	{
 		// load from cache if exists
 		$cache = Utils::getTempDir() . date($date) . "_" . md5($uri) . ".tmp";
-		if(file_exists($cache)) $data = unserialize(file_get_contents($cache));
+		if(file_exists($cache) && false) $data = unserialize(file_get_contents($cache));
 
 		// get from the internet
 		else {
 			// get the token
 			$token = 'd08dda4df1954b9781e83bd7fedc20c3';
 
+			$data = Utils::file_get_contents_curl($uri, [
+				"X-Auth-Token: $token"
+			]);
+
 			// access the api
-			$reqPrefs['http']['method'] = "GET";
+			/*$reqPrefs['http']['method'] = "GET";
 			$reqPrefs['http']['header'] = "X-Auth-Token: $token";
 			$context = stream_context_create($reqPrefs);
 			$data = json_decode(file_get_contents($uri, false, $context));
-
+*/
 			// save cache file
 			file_put_contents($cache, serialize($data));
 		}
