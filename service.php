@@ -57,7 +57,7 @@ class Service
 		];
 
 		// format the results for the view
-		foreach ($data->standings[0]->table as $std) {
+		if (isset($data->standings)) foreach ($data->standings[0]->table as $std) {
 			$standing = new StdClass();
 			$standing->position = $std->position;
 			$standing->teamId = $std->team->id;
@@ -107,7 +107,7 @@ class Service
 		];
 
 		// format the results for the view
-		if (is_object($data)) if (is_array($data->matches)) foreach ($data->matches as $m) {
+		if (isset($data->matches)) foreach ($data->matches as $m) {
 			$match = new StdClass();
 			$match->date = strftime("%e %b", strtotime($m->utcDate));
 			$match->time = date("g:ia", strtotime($m->utcDate));
@@ -153,7 +153,7 @@ class Service
 		];
 
 		// format the results for the view
-		if (is_object($data)) if (is_array($data->matches)) foreach ($data->matches as $m) {
+		if (isset($data->matches)) foreach ($data->matches as $m) {
 			$match = new StdClass();
 			$match->date = strftime("%e %b", strtotime($m->utcDate));
 			$match->time = date("g:ia", strtotime($m->utcDate));
@@ -202,7 +202,7 @@ class Service
 		];
 
 		// get team players
-		foreach ($data->squad as $squad) {
+		if (isset($data->squad)) foreach ($data->squad as $squad) {
 			$player = new StdClass();
 			$player->name = $squad->name;
 			$player->number = $squad->shirtNumber;
@@ -355,6 +355,8 @@ class Service
 				"X-Auth-Token: $token"
 			]);
 
+			$data = @json_decode($data);
+
 			// access the api
 			/*$reqPrefs['http']['method'] = "GET";
 			$reqPrefs['http']['header'] = "X-Auth-Token: $token";
@@ -365,7 +367,7 @@ class Service
 			file_put_contents($cache, serialize($data));
 		}
 
-		Core::log("$uri: ".json_encode($data), "futbol");
+		Core::log("$uri: ".substr(json_encode($data),0,100), "futbol");
 
 		// return data
 		return $data;
