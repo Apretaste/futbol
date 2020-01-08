@@ -3,6 +3,8 @@
 // locate dates in Spanish
 setlocale(LC_ALL, "es_ES", 'Spanish_Spain', 'Spanish');
 
+use Apretaste\Core;
+
 class Service
 {
 	/**
@@ -362,6 +364,8 @@ class Service
 			// save cache file
 			file_put_contents($cache, serialize($data));
 		}
+
+		Core::log("$uri: ".json_encode($data), "futbol");
 
 		// return data
 		return $data;
