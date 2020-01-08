@@ -39,6 +39,12 @@ class Service
 		$uri = "http://api.football-data.org/v2/competitions/$league/standings?season=$season";
 		$data = $this->api($uri, 'YmdH');
 
+		if (!is_object($data)) {
+			$season = date('Y') - 1;
+			$uri = "http://api.football-data.org/v2/competitions/$league/standings?season=$season";
+			$data = $this->api($uri, 'YmdH');
+		}
+
 		// create content for the view
 		$content = [
 			"league" => $this->getTeams($league),
@@ -86,6 +92,12 @@ class Service
 		$uri = "http://api.football-data.org/v2/competitions/$league/matches?status=SCHEDULED&season=$season";
 		$data = $this->api($uri, 'YmdH');
 
+		if (!is_object($data)) {
+			$season = date('Y') - 1;
+			$uri = "http://api.football-data.org/v2/competitions/$league/matches?status=SCHEDULED&season=$season";
+			$data = $this->api($uri, 'YmdH');
+		}
+
 		// create content for the view
 		$content = [
 			"league" => $this->getTeams($league),
@@ -125,6 +137,12 @@ class Service
 		// get data online
 		$uri = "http://api.football-data.org/v2/competitions/$league/matches?status=FINISHED&season=$season";
 		$data = $this->api($uri, 'YmdH');
+
+		if (!is_object($data)) {
+			$season = date('Y') - 1;
+			$uri = "http://api.football-data.org/v2/competitions/$league/matches?status=FINISHED&season=$season";
+			$data = $this->api($uri, 'YmdH');
+		}
 
 		// create content for the view
 		$content = [
@@ -321,6 +339,7 @@ class Service
 	 */
 	private function api($uri, $date="Y")
 	{
+		$data = false;
 		// load from cache if exists
 		$cache = Utils::getTempDir() . date($date) . "_" . md5($uri) . ".tmp";
 		if(file_exists($cache) && false) $data = unserialize(file_get_contents($cache));
