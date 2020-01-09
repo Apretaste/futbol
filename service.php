@@ -46,6 +46,12 @@ class Service
 		$uri = "http://api.football-data.org/v2/competitions/$league/standings?season=$season";
 		$data = $this->api($uri, 'YmdH');
 
+		if (!is_object($data)) {
+			$season = date('Y') - 1;
+			$uri = "http://api.football-data.org/v2/competitions/$league/standings?season=$season";
+			$data = $this->api($uri, 'YmdH');
+		}
+
 		// create content for the view
 		$content = [
 			"league" => $this->getTeams($league),
@@ -56,7 +62,7 @@ class Service
 		];
 
 		// format the results for the view
-		foreach ($data->standings[0]->table as $std) {
+		if (isset($data->standings))  foreach ($data->standings[0]->table as $std) {
 			$standing = new StdClass();
 			$standing->position = $std->position;
 			$standing->teamId = $std->team->id;
@@ -94,6 +100,13 @@ class Service
 		$uri = "http://api.football-data.org/v2/competitions/$league/matches?status=SCHEDULED&season=$season";
 		$data = $this->api($uri, 'YmdH');
 
+		if (!is_object($data)) {
+			$season = date('Y') - 1;
+			$uri = "http://api.football-data.org/v2/competitions/$league/matches?status=SCHEDULED&season=$season";
+			$data = $this->api($uri, 'YmdH');
+		}
+
+
 		// create content for the view
 		$content = [
 			"league" => $this->getTeams($league),
@@ -101,7 +114,7 @@ class Service
 		];
 
 		// format the results for the view
-		foreach ($data->matches as $m) {
+		if (isset($data->matches))  foreach ($data->matches as $m) {
 			$match = new StdClass();
 			$match->date = strftime("%e %b", strtotime($m->utcDate));
 			$match->time = date("g:ia", strtotime($m->utcDate));
@@ -135,6 +148,12 @@ class Service
 		$uri = "http://api.football-data.org/v2/competitions/$league/matches?status=FINISHED&season=$season";
 		$data = $this->api($uri, 'YmdH');
 
+		if (!is_object($data)) {
+			$season = date('Y') - 1;
+			$uri = "http://api.football-data.org/v2/competitions/$league/matches?status=FINISHED&season=$season";
+			$data = $this->api($uri, 'YmdH');
+		}
+
 		// create content for the view
 		$content = [
 			"league" => $this->getTeams($league),
@@ -142,7 +161,7 @@ class Service
 		];
 
 		// format the results for the view
-		foreach ($data->matches as $m) {
+		if (isset($data->matches)) foreach ($data->matches as $m) {
 			$match = new StdClass();
 			$match->date = strftime("%e %b", strtotime($m->utcDate));
 			$match->time = date("g:ia", strtotime($m->utcDate));
@@ -192,7 +211,7 @@ class Service
 		];
 
 		// get team players
-		foreach ($data->squad as $squad) {
+		if (isset($data->squad)) foreach ($data->squad as $squad) {
 			$player = new StdClass();
 			$player->name = $squad->name;
 			$player->number = $squad->shirtNumber;
@@ -331,14 +350,16 @@ class Service
 	 */
 	private function api($uri, $date="Y")
 	{
+		$data = false;
+
 		// load from cache if exists
 		$cache = TEMP_PATH . date($date) . "_" . md5($uri) . ".tmp";
-		if(file_exists($cache)) $data = unserialize(file_get_contents($cache));
+		if(file_exists($cache) && false) $data = unserialize(file_get_contents($cache));
 
 		// get from the internet
 		else {
 			// get the token
-			$token = 'b8044b406aca4851ac7ceeea79fccaea';
+			$token = 'd08dda4df1954b9781e83bd7fedc20c3';
 
 			// access the api
 			$reqPrefs['http']['method'] = "GET";
