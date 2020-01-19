@@ -12,31 +12,31 @@ class Service
 	/**
 	 * Display the list of leagues
 	 *
-	 * @param \Apretaste\Request  $request
+	 * @param \Apretaste\Request $request
 	 * @param \Apretaste\Response $response
 	 *
 	 * @throws \Framework\Alert
 	 * @author salvipascual
 	 */
-	public function _main (Request $request, Response &$response)
+	public function _main(Request $request, Response &$response)
 	{
 		// get all opened leagues
 		$teams = $this->getTeams();
 
 		// send information to the view
 		$response->setCache();
-		$response->setTemplate("home.ejs", ["teams"=>$teams]);
+		$response->setTemplate("home.ejs", ["teams" => $teams]);
 	}
 
 	/**
 	 * Muestra las posiciones dentro de una liga
 	 *
 	 * @author salvipascual
-	 * @param \Apretaste\Request  $request
+	 * @param \Apretaste\Request $request
 	 * @param \Apretaste\Response $response
 	 * @throws \Framework\Alert
 	 */
-	public function _marcador (Request $request, Response &$response)
+	public function _marcador(Request $request, Response &$response)
 	{
 		// pull the league
 		$league = $request->input->data->id;
@@ -62,19 +62,21 @@ class Service
 		];
 
 		// format the results for the view
-		if (isset($data->standings))  foreach ($data->standings[0]->table as $std) {
-			$standing = new StdClass();
-			$standing->position = $std->position;
-			$standing->teamId = $std->team->id;
-			$standing->teamName = $std->team->name;
-			$standing->won = $std->won;
-			$standing->draw = $std->draw;
-			$standing->lost = $std->lost;
-			$standing->points = $std->points;
-			$standing->goalsFor = $std->goalsFor;
-			$standing->goalsAgainst = $std->goalsAgainst;
-			$standing->goalDiff = $std->goalDifference;
-			$content['standings'][] = $standing;
+		if (isset($data->standings)) {
+			foreach ($data->standings[0]->table as $std) {
+				$standing = new StdClass();
+				$standing->position = $std->position;
+				$standing->teamId = $std->team->id;
+				$standing->teamName = $std->team->name;
+				$standing->won = $std->won;
+				$standing->draw = $std->draw;
+				$standing->lost = $std->lost;
+				$standing->points = $std->points;
+				$standing->goalsFor = $std->goalsFor;
+				$standing->goalsAgainst = $std->goalsAgainst;
+				$standing->goalDiff = $std->goalDifference;
+				$content['standings'][] = $standing;
+			}
 		}
 
 		// send information to the view
@@ -86,11 +88,11 @@ class Service
 	 * Muestra los proximos juegos de una liga
 	 *
 	 * @author salvipascual
-	 * @param \Apretaste\Request  $request
+	 * @param \Apretaste\Request $request
 	 * @param \Apretaste\Response $response
 	 * @throws \Framework\Alert
 	 */
-	public function _siguientes (Request $request, Response &$response)
+	public function _siguientes(Request $request, Response &$response)
 	{
 		// pull the league
 		$league = $request->input->data->id;
@@ -114,15 +116,17 @@ class Service
 		];
 
 		// format the results for the view
-		if (isset($data->matches))  foreach ($data->matches as $m) {
-			$match = new StdClass();
-			$match->date = strftime("%e %b", strtotime($m->utcDate));
-			$match->time = date("g:ia", strtotime($m->utcDate));
-			$match->homeId = $m->homeTeam->id;
-			$match->homeName = $m->homeTeam->name;
-			$match->awayId = $m->awayTeam->id;
-			$match->awayName = $m->awayTeam->name;
-			$content['matches'][] = $match;
+		if (isset($data->matches)) {
+			foreach ($data->matches as $m) {
+				$match = new StdClass();
+				$match->date = strftime("%e %b", strtotime($m->utcDate));
+				$match->time = date("g:ia", strtotime($m->utcDate));
+				$match->homeId = $m->homeTeam->id;
+				$match->homeName = $m->homeTeam->name;
+				$match->awayId = $m->awayTeam->id;
+				$match->awayName = $m->awayTeam->name;
+				$content['matches'][] = $match;
+			}
 		}
 
 		// send information to the view
@@ -134,11 +138,11 @@ class Service
 	 * Muestra los resultados de la liga hasta ahora
 	 *
 	 * @author salvipascual
-	 * @param \Apretaste\Request  $request
+	 * @param \Apretaste\Request $request
 	 * @param \Apretaste\Response $response
 	 * @throws \Framework\Alert
 	 */
-	public function _resultados (Request $request, Response &$response)
+	public function _resultados(Request $request, Response &$response)
 	{
 		// pull the league
 		$league = $request->input->data->id;
@@ -161,17 +165,19 @@ class Service
 		];
 
 		// format the results for the view
-		if (isset($data->matches)) foreach ($data->matches as $m) {
-			$match = new StdClass();
-			$match->date = strftime("%e %b", strtotime($m->utcDate));
-			$match->time = date("g:ia", strtotime($m->utcDate));
-			$match->homeId = $m->homeTeam->id;
-			$match->homeName = $m->homeTeam->name;
-			$match->homeScore = $m->score->fullTime->homeTeam;
-			$match->awayId = $m->awayTeam->id;
-			$match->awayName = $m->awayTeam->name;
-			$match->awayScore = $m->score->fullTime->awayTeam;
-			$content['matches'][] = $match;
+		if (isset($data->matches)) {
+			foreach ($data->matches as $m) {
+				$match = new StdClass();
+				$match->date = strftime("%e %b", strtotime($m->utcDate));
+				$match->time = date("g:ia", strtotime($m->utcDate));
+				$match->homeId = $m->homeTeam->id;
+				$match->homeName = $m->homeTeam->name;
+				$match->homeScore = $m->score->fullTime->homeTeam;
+				$match->awayId = $m->awayTeam->id;
+				$match->awayName = $m->awayTeam->name;
+				$match->awayScore = $m->score->fullTime->awayTeam;
+				$content['matches'][] = $match;
+			}
 		}
 
 		// sort by date
@@ -188,11 +194,11 @@ class Service
 	 * Muestra detalles del equipo de una liga
 	 *
 	 * @author salvipascual
-	 * @param \Apretaste\Request  $request
+	 * @param \Apretaste\Request $request
 	 * @param \Apretaste\Response $response
 	 * @throws \Framework\Alert
 	 */
-	public function _equipo (Request $request, Response &$response)
+	public function _equipo(Request $request, Response &$response)
 	{
 		// pull the team
 		$team = $request->input->data->id;
@@ -211,15 +217,17 @@ class Service
 		];
 
 		// get team players
-		if (isset($data->squad)) foreach ($data->squad as $squad) {
-			$player = new StdClass();
-			$player->name = $squad->name;
-			$player->number = $squad->shirtNumber;
-			$player->position = $this->t($squad->position);
-			$player->dob = strftime("%e/%m/%Y", strtotime($squad->dateOfBirth));
-			$player->country = $squad->countryOfBirth;
-			$player->role = ucwords(strtolower(str_replace('_', ' ', $squad->role)));
-			$content['players'][] = $player;
+		if (isset($data->squad)) {
+			foreach ($data->squad as $squad) {
+				$player = new StdClass();
+				$player->name = $squad->name;
+				$player->number = $squad->shirtNumber;
+				$player->position = $this->t($squad->position);
+				$player->dob = strftime("%e/%m/%Y", strtotime($squad->dateOfBirth));
+				$player->country = $squad->countryOfBirth;
+				$player->role = ucwords(strtolower(str_replace('_', ' ', $squad->role)));
+				$content['players'][] = $player;
+			}
 		}
 
 		// send information to the view
@@ -234,7 +242,7 @@ class Service
 	 * @param String $code
 	 * @return Array
 	 */
-	private function getTeams($code=false)
+	private function getTeams($code = false)
 	{
 		$teams = [];
 
@@ -243,7 +251,9 @@ class Service
 		$team->leagueName = "Primera División Española";
 		$team->countryCode = "es";
 		$team->countryName = "España";
-		if($code == $team->leagueCode) return $team;
+		if ($code == $team->leagueCode) {
+			return $team;
+		}
 		$teams[] = $team;
 
 		$team = new StdClass();
@@ -251,7 +261,9 @@ class Service
 		$team->leagueName = "UEFA Champions League";
 		$team->countryCode = "";
 		$team->countryName = "Europa";
-		if($code == $team->leagueCode) return $team;
+		if ($code == $team->leagueCode) {
+			return $team;
+		}
 		$teams[] = $team;
 
 		$team = new StdClass();
@@ -259,7 +271,9 @@ class Service
 		$team->leagueName = "Premier League";
 		$team->countryCode = "gb";
 		$team->countryName = "England";
-		if($code == $team->leagueCode) return $team;
+		if ($code == $team->leagueCode) {
+			return $team;
+		}
 		$teams[] = $team;
 
 		$team = new StdClass();
@@ -267,7 +281,9 @@ class Service
 		$team->leagueName = "Bundesliga";
 		$team->countryCode = "de";
 		$team->countryName = "Alemania";
-		if($code == $team->leagueCode) return $team;
+		if ($code == $team->leagueCode) {
+			return $team;
+		}
 		$teams[] = $team;
 
 		$team = new StdClass();
@@ -275,7 +291,9 @@ class Service
 		$team->leagueName = "Eredivisie";
 		$team->countryCode = "nl";
 		$team->countryName = "Holanda";
-		if($code == $team->leagueCode) return $team;
+		if ($code == $team->leagueCode) {
+			return $team;
+		}
 		$teams[] = $team;
 
 		$team = new StdClass();
@@ -283,7 +301,9 @@ class Service
 		$team->leagueName = "French League One";
 		$team->countryCode = "fr";
 		$team->countryName = "Francia";
-		if($code == $team->leagueCode) return $team;
+		if ($code == $team->leagueCode) {
+			return $team;
+		}
 		$teams[] = $team;
 
 		$team = new StdClass();
@@ -291,7 +311,9 @@ class Service
 		$team->leagueName = "Portugal Primeira Liga";
 		$team->countryCode = "pt";
 		$team->countryName = "Portugal";
-		if($code == $team->leagueCode) return $team;
+		if ($code == $team->leagueCode) {
+			return $team;
+		}
 		$teams[] = $team;
 
 		$team = new StdClass();
@@ -299,7 +321,9 @@ class Service
 		$team->leagueName = "English Football League Two";
 		$team->countryCode = "gb";
 		$team->countryName = "United Kingdom";
-		if($code == $team->leagueCode) return $team;
+		if ($code == $team->leagueCode) {
+			return $team;
+		}
 		$teams[] = $team;
 
 		$team = new StdClass();
@@ -307,7 +331,9 @@ class Service
 		$team->leagueName = "Serie A";
 		$team->countryCode = "it";
 		$team->countryName = "Italia";
-		if($code == $team->leagueCode) return $team;
+		if ($code == $team->leagueCode) {
+			return $team;
+		}
 		$teams[] = $team;
 
 		$team = new StdClass();
@@ -315,7 +341,9 @@ class Service
 		$team->leagueName = "Brasileiro Serie A";
 		$team->countryCode = "br";
 		$team->countryName = "Brasil";
-		if($code == $team->leagueCode) return $team;
+		if ($code == $team->leagueCode) {
+			return $team;
+		}
 		$teams[] = $team;
 
 		return $teams;
@@ -348,13 +376,15 @@ class Service
 	 * @param String $date
 	 * @return Array
 	 */
-	private function api($uri, $date="Y")
+	private function api($uri, $date = "Y")
 	{
 		$data = false;
 
 		// load from cache if exists
 		$cache = TEMP_PATH . date($date) . "_" . md5($uri) . ".tmp";
-		if(file_exists($cache) && false) $data = unserialize(file_get_contents($cache));
+		if (file_exists($cache) && false) {
+			$data = unserialize(file_get_contents($cache));
+		}
 
 		// get from the internet
 		else {
