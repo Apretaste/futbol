@@ -3,6 +3,7 @@
 use Apretaste\Request;
 use Apretaste\Response;
 use Apretaste\Challenges;
+use Framework\Crawler;
 
 // locate dates in Spanish
 setlocale(LC_ALL, "es_ES", 'Spanish_Spain', 'Spanish');
@@ -392,10 +393,7 @@ class Service
 			$token = 'd08dda4df1954b9781e83bd7fedc20c3';
 
 			// access the api
-			$reqPrefs['http']['method'] = "GET";
-			$reqPrefs['http']['header'] = "X-Auth-Token: $token";
-			$context = stream_context_create($reqPrefs);
-			$data = json_decode(file_get_contents($uri, false, $context));
+			$data = json_decode(Crawler::get($uri,'GET',null,["X-Auth-Token: $token"]));
 
 			// save cache file
 			file_put_contents($cache, serialize($data));
