@@ -1,9 +1,9 @@
 {
 	"name": "futbol",
+	"caption": "Futbol",
 	"description": "Muestra los resultados de los torneos más importantes de futbol",
 	"category": "ocio",
 	"creator": "kumahacker@gmail.com",
 	"listed": true,
-	"guest": true,
-	"caption": "Futbol"
+	"guest": true
 }

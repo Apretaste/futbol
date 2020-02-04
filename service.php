@@ -6,18 +6,13 @@ use Apretaste\Challenges;
 use Framework\Alert;
 use Framework\Crawler;
 
-// locate dates in Spanish
-setlocale(LC_ALL, "es_ES", 'Spanish_Spain', 'Spanish');
-
 class Service
 {
 	/**
 	 * Display the list of leagues
 	 *
-	 * @param \Apretaste\Request $request
-	 * @param \Apretaste\Response $response
-	 *
-	 * @throws \Framework\Alert
+	 * @param Request $request
+	 * @param Response $response
 	 * @author salvipascual
 	 */
 	public function _main(Request $request, Response &$response)
@@ -34,9 +29,8 @@ class Service
 	 * Muestra las posiciones dentro de una liga
 	 *
 	 * @author salvipascual
-	 * @param \Apretaste\Request $request
-	 * @param \Apretaste\Response $response
-	 * @throws \Framework\Alert
+	 * @param Request $request
+	 * @param Response $response
 	 */
 	public function _marcador(Request $request, Response &$response)
 	{
@@ -90,9 +84,8 @@ class Service
 	 * Muestra los proximos juegos de una liga
 	 *
 	 * @author salvipascual
-	 * @param \Apretaste\Request $request
-	 * @param \Apretaste\Response $response
-	 * @throws \Framework\Alert
+	 * @param Request $request
+	 * @param Response $response
 	 */
 	public function _siguientes(Request $request, Response &$response)
 	{
@@ -140,9 +133,8 @@ class Service
 	 * Muestra los resultados de la liga hasta ahora
 	 *
 	 * @author salvipascual
-	 * @param \Apretaste\Request $request
-	 * @param \Apretaste\Response $response
-	 * @throws \Framework\Alert
+	 * @param Request $request
+	 * @param Response $response
 	 */
 	public function _resultados(Request $request, Response &$response)
 	{
@@ -196,9 +188,8 @@ class Service
 	 * Muestra detalles del equipo de una liga
 	 *
 	 * @author salvipascual
-	 * @param \Apretaste\Request $request
-	 * @param \Apretaste\Response $response
-	 * @throws \Framework\Alert
+	 * @param Request $request
+	 * @param Response $response
 	 */
 	public function _equipo(Request $request, Response &$response)
 	{
@@ -383,7 +374,7 @@ class Service
 		$data = false;
 
 		// load from cache if exists
-		$cache = TEMP_PATH . date($date) . "_" . md5($uri) . ".tmp";
+		$cache = TEMP_PATH . 'cache/' . date($date) . "_" . md5($uri) . ".tmp";
 		if (file_exists($cache) && false) {
 			$data = unserialize(file_get_contents($cache));
 		}
