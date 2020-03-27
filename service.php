@@ -26,7 +26,7 @@ class Service
 
 		// send information to the view
 		$response->setCache();
-		$response->setTemplate('home.ejs', ['teams' => (array) $teams]);
+		$response->setTemplate('home.ejs', ['teams' => $teams]);
 	}
 
 	/**
@@ -306,7 +306,7 @@ class Service
 			  ]
 			];
 		}
-		return self::$teams[$code] ?? self::$teams;
+		return self::$teams[$code] ?? array_values(self::$teams);
 	}
 
 	/**
