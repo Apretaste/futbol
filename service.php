@@ -3,14 +3,15 @@
 use Apretaste\Request;
 use Apretaste\Response;
 use Apretaste\Challenges;
-use Framework\Alert;
 use Framework\Crawler;
 
 // locate dates in Spanish
-setlocale(LC_ALL, "es_ES", 'Spanish_Spain', 'Spanish');
+setlocale(LC_ALL, 'es_ES', 'Spanish_Spain', 'Spanish');
 
 class Service
 {
+	public static array $teams = [];
+
 	/**
 	 * Display the list of leagues
 	 *
@@ -27,7 +28,7 @@ class Service
 
 		// send information to the view
 		$response->setCache();
-		$response->setTemplate("home.ejs", ["teams" => $teams]);
+		$response->setTemplate('home.ejs', ['teams' => $teams]);
 	}
 
 	/**
@@ -56,11 +57,11 @@ class Service
 
 		// create content for the view
 		$content = [
-			"league" => $this->getTeams($league),
-			"seasonStart" => strftime("%e de %b", strtotime($data->season->startDate)),
-			"seasonEnd" => strftime("%e de %b", strtotime($data->season->endDate)),
-			"day" => $data->season->currentMatchday,
-			"standings" => []
+			'league' => $this->getTeams($league),
+			'seasonStart' => strftime('%e de %b', strtotime($data->season->startDate)),
+			'seasonEnd' => strftime('%e de %b', strtotime($data->season->endDate)),
+			'day' => $data->season->currentMatchday,
+			'standings' => []
 		];
 
 		// format the results for the view
@@ -83,7 +84,7 @@ class Service
 
 		// send information to the view
 		$response->setCache('day');
-		$response->setTemplate("marcador.ejs", $content);
+		$response->setTemplate('marcador.ejs', $content);
 	}
 
 	/**
@@ -113,16 +114,16 @@ class Service
 
 		// create content for the view
 		$content = [
-			"league" => $this->getTeams($league),
-			"matches" => []
+			'league' => $this->getTeams($league),
+			'matches' => []
 		];
 
 		// format the results for the view
 		if (isset($data->matches)) {
 			foreach ($data->matches as $m) {
 				$match = new StdClass();
-				$match->date = strftime("%e %b", strtotime($m->utcDate));
-				$match->time = date("g:ia", strtotime($m->utcDate));
+				$match->date = strftime('%e %b', strtotime($m->utcDate));
+				$match->time = date('g:ia', strtotime($m->utcDate));
 				$match->homeId = $m->homeTeam->id;
 				$match->homeName = $m->homeTeam->name;
 				$match->awayId = $m->awayTeam->id;
@@ -133,7 +134,7 @@ class Service
 
 		// send information to the view
 		$response->setCache('day');
-		$response->setTemplate("siguientes.ejs", $content);
+		$response->setTemplate('siguientes.ejs', $content);
 	}
 
 	/**
@@ -162,16 +163,16 @@ class Service
 
 		// create content for the view
 		$content = [
-			"league" => $this->getTeams($league),
-			"matches" => []
+			'league' => $this->getTeams($league),
+			'matches' => []
 		];
 
 		// format the results for the view
 		if (isset($data->matches)) {
 			foreach ($data->matches as $m) {
 				$match = new StdClass();
-				$match->date = strftime("%e %b", strtotime($m->utcDate));
-				$match->time = date("g:ia", strtotime($m->utcDate));
+				$match->date = strftime('%e %b', strtotime($m->utcDate));
+				$match->time = date('g:ia', strtotime($m->utcDate));
 				$match->homeId = $m->homeTeam->id;
 				$match->homeName = $m->homeTeam->name;
 				$match->homeScore = $m->score->fullTime->homeTeam;
@@ -187,9 +188,9 @@ class Service
 
 		// send information to the view
 		$response->setCache('day');
-		$response->setTemplate("resultados.ejs", $content);
+		$response->setTemplate('resultados.ejs', $content);
 
-		Challenges::complete("view-futbol", $request->person->id);
+		Challenges::complete('view-futbol', $request->person->id);
 	}
 
 	/**
@@ -211,11 +212,11 @@ class Service
 
 		// create content for the view
 		$content = [
-			"name" => $data->name,
-			"area" => $data->area->name,
-			"founded" => $data->founded,
-			"venue" => $data->venue,
-			"players" => []
+			'name' => $data->name,
+			'area' => $data->area->name,
+			'founded' => $data->founded,
+			'venue' => $data->venue,
+			'players' => []
 		];
 
 		// get team players
@@ -225,7 +226,7 @@ class Service
 				$player->name = $squad->name;
 				$player->number = $squad->shirtNumber;
 				$player->position = $this->t($squad->position);
-				$player->dob = strftime("%e/%m/%Y", strtotime($squad->dateOfBirth));
+				$player->dob = strftime('%e/%m/%Y', strtotime($squad->dateOfBirth));
 				$player->country = $squad->countryOfBirth;
 				$player->role = ucwords(strtolower(str_replace('_', ' ', $squad->role)));
 				$content['players'][] = $player;
@@ -234,121 +235,84 @@ class Service
 
 		// send information to the view
 		$response->setCache();
-		$response->setTemplate("equipo.ejs", $content);
+		$response->setTemplate('equipo.ejs', $content);
 	}
 
 
 	/**
 	 * Get all available teams
 	 *
-	 * @param String $code
-	 * @return Array
+	 * @param bool $code
+	 *
+	 * @return array|\StdClass
 	 */
-	private function getTeams($code = false)
+	private function getTeams($code = 'XXX')
 	{
-		$teams = [];
-
-		$team = new StdClass();
-		$team->leagueCode = "PD";
-		$team->leagueName = "Primera División Española";
-		$team->countryCode = "es";
-		$team->countryName = "España";
-		if ($code == $team->leagueCode) {
-			return $team;
+		if (empty(self::$teams)) {
+			self::$teams = [
+			  'PD' => (object) [
+				'leagueCode' => 'PD',
+				'leagueName' => 'Primera División Española',
+				'countryCode' => 'es',
+				'countryName' => 'España'
+			  ],
+			  'CL' => (object) [
+				'leagueCode' => 'CL',
+				'leagueName' => 'UEFA Champions League',
+				'countryCode' => '',
+				'countryName' => 'Europa'
+			  ],
+			  'PL' => (object) [
+				'leagueCode' => 'PL',
+				'leagueName' => 'Premier League',
+				'countryCode' => 'gb',
+				'countryName' => 'England'
+			  ],
+			  'BL1' => (object) [
+				'leagueCode' => 'BL1',
+				'leagueName' => 'Bundesliga',
+				'countryCode' => 'de',
+				'countryName' => 'Alemania'
+			  ],
+			  'DED' => (object) [
+				'leagueCode' => 'DED',
+				'leagueName' => 'Eredivisie',
+				'countryCode' => 'nl',
+				'countryName' => 'Holanda'
+			  ],
+			  'FL1' => (object) [
+				'leagueCode' => 'FL1',
+				'leagueName' => 'French League One',
+				'countryCode' => 'fr',
+				'countryName' => 'Francia'
+			  ],
+			  'PPL' => (object) [
+				'leagueCode' => 'PPL',
+				'leagueName' => 'Portugal Primeira Liga',
+				'countryCode' => 'pt',
+				'countryName' => 'Portugal'
+			  ],
+			  'EPL' => (object) [
+				'leagueCode' => 'EFL',
+				'leagueName' => 'English Football League Two',
+				'countryCode' => 'gb',
+				'countryName' => 'United Kingdom'
+			  ],
+			  'SA' => (object) [
+				'leagueCode' => 'SA',
+				'leagueName' => 'Serie A',
+				'countryCode' => 'it',
+				'countryName' => 'Italia'
+			  ],
+			  'BSA' => (object) [
+				'leagueCode' => 'BSA',
+				'leagueName' => 'Brasileiro Serie A',
+				'countryCode' => 'br',
+				'countryName' => 'Brasil'
+			  ]
+			];
 		}
-		$teams[] = $team;
-
-		$team = new StdClass();
-		$team->leagueCode = "CL";
-		$team->leagueName = "UEFA Champions League";
-		$team->countryCode = "";
-		$team->countryName = "Europa";
-		if ($code == $team->leagueCode) {
-			return $team;
-		}
-		$teams[] = $team;
-
-		$team = new StdClass();
-		$team->leagueCode = "PL";
-		$team->leagueName = "Premier League";
-		$team->countryCode = "gb";
-		$team->countryName = "England";
-		if ($code == $team->leagueCode) {
-			return $team;
-		}
-		$teams[] = $team;
-
-		$team = new StdClass();
-		$team->leagueCode = "BL1";
-		$team->leagueName = "Bundesliga";
-		$team->countryCode = "de";
-		$team->countryName = "Alemania";
-		if ($code == $team->leagueCode) {
-			return $team;
-		}
-		$teams[] = $team;
-
-		$team = new StdClass();
-		$team->leagueCode = "DED";
-		$team->leagueName = "Eredivisie";
-		$team->countryCode = "nl";
-		$team->countryName = "Holanda";
-		if ($code == $team->leagueCode) {
-			return $team;
-		}
-		$teams[] = $team;
-
-		$team = new StdClass();
-		$team->leagueCode = "FL1";
-		$team->leagueName = "French League One";
-		$team->countryCode = "fr";
-		$team->countryName = "Francia";
-		if ($code == $team->leagueCode) {
-			return $team;
-		}
-		$teams[] = $team;
-
-		$team = new StdClass();
-		$team->leagueCode = "PPL";
-		$team->leagueName = "Portugal Primeira Liga";
-		$team->countryCode = "pt";
-		$team->countryName = "Portugal";
-		if ($code == $team->leagueCode) {
-			return $team;
-		}
-		$teams[] = $team;
-
-		$team = new StdClass();
-		$team->leagueCode = "EFL";
-		$team->leagueName = "English Football League Two";
-		$team->countryCode = "gb";
-		$team->countryName = "United Kingdom";
-		if ($code == $team->leagueCode) {
-			return $team;
-		}
-		$teams[] = $team;
-
-		$team = new StdClass();
-		$team->leagueCode = "SA";
-		$team->leagueName = "Serie A";
-		$team->countryCode = "it";
-		$team->countryName = "Italia";
-		if ($code == $team->leagueCode) {
-			return $team;
-		}
-		$teams[] = $team;
-
-		$team = new StdClass();
-		$team->leagueCode = "BSA";
-		$team->leagueName = "Brasileiro Serie A";
-		$team->countryCode = "br";
-		$team->countryName = "Brasil";
-		if ($code == $team->leagueCode) {
-			return $team;
-		}
-		$teams[] = $team;
-
-		return $teams;
+		return self::$teams[$code] ?? self::$teams;
 	}
 
 	/**
@@ -361,14 +325,14 @@ class Service
 	{
 		// array to translate to Spanish
 		$sp = [
-			"Goalkeeper" => "Portero",
-			"Defender" => "Defensa",
-			"Midfielder" => "Centrocampo",
-			"Attacker" => "Delantero",
+			'Goalkeeper' => 'Portero',
+			'Defender' => 'Defensa',
+			'Midfielder' => 'Centrocampo',
+			'Attacker' => 'Delantero',
 		];
 
 		// return word or empty
-		return isset($sp[$word]) ? $sp[$word] : "";
+		return isset($sp[$word]) ? $sp[$word] : '';
 	}
 
 	/**
@@ -376,14 +340,14 @@ class Service
 	 *
 	 * @param String $uri
 	 * @param String $date
-	 * @return Array
+	 * @return mixed
 	 */
-	private function api($uri, $date = "Y")
+	private function api($uri, $date = 'Y')
 	{
 		$data = false;
 
 		// load from cache if exists
-		$cache = TEMP_PATH . date($date) . "_" . md5($uri) . ".tmp";
+		$cache = TEMP_PATH . date($date).'_'.md5($uri).'.tmp';
 		if (file_exists($cache) && false) {
 			$data = unserialize(file_get_contents($cache));
 		}
@@ -395,8 +359,8 @@ class Service
 
 			// access the api
 			try {
-				$data = Crawler::get($uri,'GET',null,["X-Auth-Token: $token"]);
-			} catch(Exception $e){
+				$data = Crawler::get($uri, 'GET', null, ["X-Auth-Token: $token"]);
+			} catch (Exception $e) {
 				return false;
 			}
 
