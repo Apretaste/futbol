@@ -6,28 +6,28 @@
 
 <div class="row">
 	<% teams.forEach(function(team) { %>
-	<div class="col s12">
-		<div class="card horizontal">
-			<div class="card-image">
-				<img src="{{APP_SERVICE_PATH}}/images/<%= team.leagueCode %>.png">
-			</div>
-			<div class="card-stacked">
-				<div class="card-content">
-					<span class="card-title grey-text text-darken-4" onclick="apretaste.send({command: 'FUTBOL RESULTADOS', data: {id:'<%= team.leagueCode %>'}})">
-						<%= team.leagueName %>
-					</span>
-					<p>
-						<% if(team.countryCode) { %>
-							<img class="flag" src="{{APP_RESOURCES}}/images/flags/<%= team.countryCode %>.png"/>
-						<% } %> &nbsp;
-						<%= team.countryName %>
-					</p>
+		<div class="col s12">
+			<div class="card horizontal">
+				<div class="card-image">
+					<img src="{{APP_SERVICE_PATH}}/images/<%= team.leagueCode %>.png">
 				</div>
-				<div class="card-action">
-					<a href = "#!" onclick="apretaste.send({command: 'FUTBOL RESULTADOS', data: {id:'<%= team.leagueCode %>'}})">Resultados</a>
+				<div class="card-stacked">
+					<div class="card-content">
+						<span class="card-title grey-text text-darken-4" onclick="apretaste.send({command: 'FUTBOL RESULTADOS', data: {id:'<%= team.leagueCode %>'}})">
+							<%= team.leagueName %>
+						</span>
+						<p>
+							<% if(team.countryCode) { %>
+								<img class="flag" src="{{APP_RESOURCES}}/images/flags/<%= team.countryCode %>.png"/>
+							<% } %> &nbsp;
+							<%= team.countryName %>
+						</p>
+					</div>
+					<div class="card-action">
+						<a href = "#!" onclick="apretaste.send({command: 'FUTBOL RESULTADOS', data: {id:'<%= team.leagueCode %>'}})">Resultados</a>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
 	<% }) %>
 </div>
