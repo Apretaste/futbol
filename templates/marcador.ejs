@@ -41,7 +41,7 @@
 				</tr>
 			</thead>
 			<tbody>
-                <% for(var i=0; i< standings.length(); i++) { var std = matches[i]; %>
+                <% for(var i=0; i< standings.length; i++) { var std = matches[i]; %>
 				<tr>
 					<td>#<%= std.position %></td>
 					<td class="left"><a href="#!" onclick="apretaste.send({command:'FUTBOL EQUIPO', data:{id:'<%= std.teamId %>'}})"><%= std.teamName %></a></td>
