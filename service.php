@@ -52,10 +52,10 @@ class Service
 			$season = date('Y') - 1;
 			$uri = "http://api.football-data.org/v2/competitions/$league/standings?season=$season";
 			$data = $this->api($uri, 'YmdH');
-		}
 
-		if (!is_object($data) || !isset($data->season)) {
-			throw new Alert(500, "Error consultando la Api de futbol: http://api.football-data.org/v2/competitions/$league/standings?season=$season");
+			if (!is_object($data) || !isset($data->season)) {
+				throw new Alert(500, "Error consultando la Api de futbol: http://api.football-data.org/v2/competitions/$league/standings?season=$season");
+			}
 		}
 
 		// create content for the view
