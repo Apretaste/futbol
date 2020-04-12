@@ -5,9 +5,6 @@ use Apretaste\Response;
 use Apretaste\Challenges;
 use Framework\Crawler;
 
-// locate dates in Spanish
-setlocale(LC_ALL, 'es_ES', 'Spanish_Spain', 'Spanish');
-
 class Service
 {
 	public static array $teams = [];
@@ -17,9 +14,11 @@ class Service
 	 *
 	 * @param Request $request
 	 * @param Response $response
+	 *
+	 * @throws \Framework\Alert
 	 * @author salvipascual
 	 */
-	public function _main(Request $request, Response &$response)
+	public function _main(Request $request, Response $response)
 	{
 		// get all opened leagues
 		$teams = $this->getTeams();
@@ -32,11 +31,13 @@ class Service
 	/**
 	 * Muestra las posiciones dentro de una liga
 	 *
-	 * @author salvipascual
 	 * @param Request $request
 	 * @param Response $response
+	 *
+	 * @throws \Framework\Alert
+	 * @author salvipascual
 	 */
-	public function _marcador(Request $request, Response &$response)
+	public function _marcador(Request $request, Response $response)
 	{
 		// pull the league
 		$league = $request->input->data->id;
@@ -87,11 +88,13 @@ class Service
 	/**
 	 * Muestra los proximos juegos de una liga
 	 *
-	 * @author salvipascual
 	 * @param Request $request
 	 * @param Response $response
+	 *
+	 * @throws \Framework\Alert
+	 * @author salvipascual
 	 */
-	public function _siguientes(Request $request, Response &$response)
+	public function _siguientes(Request $request, Response $response)
 	{
 		// pull the league
 		$league = $request->input->data->id;
@@ -136,11 +139,13 @@ class Service
 	/**
 	 * Muestra los resultados de la liga hasta ahora
 	 *
-	 * @author salvipascual
 	 * @param Request $request
 	 * @param Response $response
+	 *
+	 * @throws \Framework\Alert
+	 * @author salvipascual
 	 */
-	public function _resultados(Request $request, Response &$response)
+	public function _resultados(Request $request, Response $response)
 	{
 		// pull the league
 		$league = $request->input->data->id;
@@ -191,11 +196,13 @@ class Service
 	/**
 	 * Muestra detalles del equipo de una liga
 	 *
-	 * @author salvipascual
 	 * @param Request $request
 	 * @param Response $response
+	 *
+	 * @throws \Framework\Alert
+	 * @author salvipascual
 	 */
-	public function _equipo(Request $request, Response &$response)
+	public function _equipo(Request $request, Response $response)
 	{
 		// pull the team
 		$team = $request->input->data->id;
@@ -326,7 +333,7 @@ class Service
 		];
 
 		// return word or empty
-		return isset($sp[$word]) ? $sp[$word] : '';
+		return $sp[$word] ?? '';
 	}
 
 	/**
