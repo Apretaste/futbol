@@ -54,7 +54,15 @@ class Service
 			$data = $this->api($uri, 'YmdH');
 
 			if (!is_object($data) || !isset($data->season)) {
-				throw new Alert(500, "Error consultando la Api de futbol: http://api.football-data.org/v2/competitions/$league/standings?season=$season");
+				$alert = new Alert(500, "Error consultando la Api de futbol: http://api.football-data.org/v2/competitions/$league/standings?season=$season");
+				$alert->post();
+				$response->setTemplate("message.ejs", [
+				  'header' => 'Hubo un problema',
+				  'text' => 'Tenemos un problema consultando estos datos. El equipo tecnico se esta encargando. Disculpa las molestias.',
+				  'icon' => 'sentiment_very_dissatisfied',
+				  'button' => ['href' => 'FUTBOL', 'caption' => 'Volver']
+				]);
+				return;
 			}
 		}
 
