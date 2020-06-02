@@ -9,7 +9,7 @@
 		<p>
 			<% if(league.countryCode) { %>
 				<img class="flag" src="{{APP_RESOURCES}}/images/flags/<%= league.countryCode %>.png"/>
-			<% } %>
+			<% } %>&nbsp;
 			<%= league.countryName %><br>
 			<%= seasonStart %> al <%= seasonEnd %><br>
 			Día #<%= day %>
@@ -41,7 +41,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<% standings.forEach(function(std) { %>
+                <% for(var i=0; i< standings.length; i++) { var std = matches[i]; %>
 				<tr>
 					<td>#<%= std.position %></td>
 					<td class="left"><a href="#!" onclick="apretaste.send({command:'FUTBOL EQUIPO', data:{id:'<%= std.teamId %>'}})"><%= std.teamName %></a></td>
@@ -50,7 +50,7 @@
 					<td><%= std.goalsFor %>/<%= std.goalsAgainst %></td>
 					<td><%= std.goalDiff %></td>
 				</tr>
-				<% }) %>
+				<% } %>
 			</tbody>
 		</table>
 	</div>
