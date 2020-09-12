@@ -9,15 +9,11 @@ use Framework\Core;
 
 class Service
 {
-	public static array $teams = [];
-
 	/**
 	 * Display the list of leagues
 	 *
 	 * @param Request $request
 	 * @param Response $response
-	 *
-	 * @throws \Framework\Alert
 	 * @author salvipascual
 	 */
 	public function _main(Request $request, Response $response)
@@ -35,8 +31,6 @@ class Service
 	 *
 	 * @param Request $request
 	 * @param Response $response
-	 *
-	 * @throws \Framework\Alert
 	 * @author salvipascual
 	 */
 	public function _marcador(Request $request, Response $response)
@@ -46,22 +40,20 @@ class Service
 		$season = date('Y');
 
 		// get data online
-		$uri = "http://api.football-data.org/v2/competitions/$league/standings?season=$season";
-		$data = $this->api($uri, 'YmdH');
+		$data = $this->api("http://api.football-data.org/v2/competitions/$league/standings?season=$season");
 
 		if (!is_object($data)) {
 			$season = date('Y') - 1;
-			$uri = "http://api.football-data.org/v2/competitions/$league/standings?season=$season";
-			$data = $this->api($uri, 'YmdH');
+			$data = $this->api("http://api.football-data.org/v2/competitions/$league/standings?season=$season");
 
 			if (!is_object($data) || !isset($data->season)) {
 				$alert = new Alert(500, "Error consultando la Api de futbol: http://api.football-data.org/v2/competitions/$league/standings?season=$season");
 				$alert->post();
 				$response->setTemplate("message.ejs", [
-				  'header' => 'Hubo un problema',
-				  'text' => 'Tenemos un problema consultando estos datos. El equipo tecnico se esta encargando. Disculpa las molestias.',
-				  'icon' => 'sentiment_very_dissatisfied',
-				  'button' => ['href' => 'FUTBOL', 'caption' => 'Volver']
+					'header' => 'Hubo un problema',
+					'text' => 'Tenemos un problema consultando estos datos. El equipo tecnico se esta encargando. Disculpa las molestias.',
+					'icon' => 'sentiment_very_dissatisfied',
+					'button' => ['href' => 'FUTBOL', 'caption' => 'Volver']
 				]);
 				return;
 			}
@@ -77,7 +69,7 @@ class Service
 		];
 
 		// format the results for the view
-		if (isset($data->standings)) {
+		if (!empty($data->standings)) {
 			foreach ($data->standings[0]->table as $std) {
 				$standing = new StdClass();
 				$standing->position = $std->position;
@@ -104,8 +96,6 @@ class Service
 	 *
 	 * @param Request $request
 	 * @param Response $response
-	 *
-	 * @throws \Framework\Alert
 	 * @author salvipascual
 	 */
 	public function _siguientes(Request $request, Response $response)
@@ -115,13 +105,11 @@ class Service
 		$season = date('Y');
 
 		// get data online
-		$uri = "http://api.football-data.org/v2/competitions/$league/matches?status=SCHEDULED&season=$season";
-		$data = $this->api($uri, 'YmdH');
+		$data = $this->api("http://api.football-data.org/v2/competitions/$league/matches?status=SCHEDULED&season=$season");
 
 		if (!is_object($data)) {
 			$season = date('Y') - 1;
-			$uri = "http://api.football-data.org/v2/competitions/$league/matches?status=SCHEDULED&season=$season";
-			$data = $this->api($uri, 'YmdH');
+			$data = $this->api("http://api.football-data.org/v2/competitions/$league/matches?status=SCHEDULED&season=$season");
 		}
 
 		// create content for the view
@@ -131,7 +119,7 @@ class Service
 		];
 
 		// format the results for the view
-		if (isset($data->matches)) {
+		if (!empty($data->matches)) {
 			foreach ($data->matches as $m) {
 				$match = new StdClass();
 				$match->date = strftime('%e %b', strtotime($m->utcDate));
@@ -154,8 +142,6 @@ class Service
 	 *
 	 * @param Request $request
 	 * @param Response $response
-	 *
-	 * @throws \Framework\Alert
 	 * @author salvipascual
 	 */
 	public function _resultados(Request $request, Response $response)
@@ -165,13 +151,11 @@ class Service
 		$season = date('Y');
 
 		// get data online
-		$uri = "http://api.football-data.org/v2/competitions/$league/matches?status=FINISHED&season=$season";
-		$data = $this->api($uri, 'YmdH');
+		$data = $this->api("http://api.football-data.org/v2/competitions/$league/matches?status=FINISHED&season=$season");
 
 		if (!is_object($data)) {
 			$season = date('Y') - 1;
-			$uri = "http://api.football-data.org/v2/competitions/$league/matches?status=FINISHED&season=$season";
-			$data = $this->api($uri, 'YmdH');
+			$data = $this->api("http://api.football-data.org/v2/competitions/$league/matches?status=FINISHED&season=$season");
 		}
 
 		// create content for the view
@@ -181,7 +165,7 @@ class Service
 		];
 
 		// format the results for the view
-		if (isset($data->matches)) {
+		if (!empty($data->matches)) {
 			foreach ($data->matches as $m) {
 				$match = new StdClass();
 				$match->date = strftime('%e %b', strtotime($m->utcDate));
@@ -199,11 +183,12 @@ class Service
 		// sort by date
 		$content['matches'] = array_reverse($content['matches']);
 
+		// set challenge
+		Challenges::complete('view-futbol', $request->person->id);
+
 		// send information to the view
 		$response->setCache('day');
 		$response->setTemplate('resultados.ejs', $content);
-
-		Challenges::complete('view-futbol', $request->person->id);
 	}
 
 	/**
@@ -221,8 +206,7 @@ class Service
 		$team = $request->input->data->id;
 
 		// get data online
-		$uri = "http://api.football-data.org/v2/teams/$team";
-		$data = $this->api($uri);
+		$data = $this->api("http://api.football-data.org/v2/teams/$team");
 
 		// create content for the view
 		$content = [
@@ -239,10 +223,9 @@ class Service
 				$player = new StdClass();
 				$player->name = $squad->name;
 				$player->number = $squad->shirtNumber;
-				$player->position = $this->t($squad->position);
+				$player->position = ($squad->role=="COACH" || $squad->role=="ASSISTANT_COACH") ? 'Entrenador' : $this->t($squad->position);
 				$player->dob = strftime('%e/%m/%Y', strtotime($squad->dateOfBirth));
 				$player->country = $squad->countryOfBirth;
-				$player->role = ucwords(strtolower(str_replace('_', ' ', $squad->role)));
 				$content['players'][] = $player;
 			}
 		}
@@ -252,81 +235,80 @@ class Service
 		$response->setTemplate('equipo.ejs', $content);
 	}
 
-
 	/**
 	 * Get all available teams
 	 *
-	 * @param bool $code
-	 *
+	 * @param String $code
 	 * @return array|\StdClass
 	 */
-	private function getTeams($code = 'XXX')
+	private function getTeams($code = false)
 	{
-		if (empty(self::$teams)) {
-			self::$teams = [
-			  'PD' => (object) [
+		// crate the array of teams
+		$teams = [
+			'PD' => (object) [
 				'leagueCode' => 'PD',
 				'leagueName' => 'Primera División Española',
 				'countryCode' => 'es',
 				'countryName' => 'España'
-			  ],
-			  'CL' => (object) [
+			],
+			'CL' => (object) [
 				'leagueCode' => 'CL',
 				'leagueName' => 'UEFA Champions League',
-				'countryCode' => '',
+				'countryCode' => 'eu',
 				'countryName' => 'Europa'
-			  ],
-			  'PL' => (object) [
+			],
+			'PL' => (object) [
 				'leagueCode' => 'PL',
 				'leagueName' => 'Premier League',
 				'countryCode' => 'gb',
 				'countryName' => 'England'
-			  ],
-			  'BL1' => (object) [
+			],
+			'BL1' => (object) [
 				'leagueCode' => 'BL1',
 				'leagueName' => 'Bundesliga',
 				'countryCode' => 'de',
 				'countryName' => 'Alemania'
-			  ],
-			  'DED' => (object) [
+			],
+			'DED' => (object) [
 				'leagueCode' => 'DED',
 				'leagueName' => 'Eredivisie',
 				'countryCode' => 'nl',
 				'countryName' => 'Holanda'
-			  ],
-			  'FL1' => (object) [
+			],
+			'FL1' => (object) [
 				'leagueCode' => 'FL1',
 				'leagueName' => 'French League One',
 				'countryCode' => 'fr',
 				'countryName' => 'Francia'
-			  ],
-			  'PPL' => (object) [
+			],
+			'PPL' => (object) [
 				'leagueCode' => 'PPL',
 				'leagueName' => 'Portugal Primeira Liga',
 				'countryCode' => 'pt',
 				'countryName' => 'Portugal'
-			  ],
-			  'EPL' => (object) [
+			],
+			'EFL' => (object) [
 				'leagueCode' => 'EFL',
 				'leagueName' => 'English Football League Two',
 				'countryCode' => 'gb',
 				'countryName' => 'United Kingdom'
-			  ],
-			  'SA' => (object) [
+			],
+			'SA' => (object) [
 				'leagueCode' => 'SA',
 				'leagueName' => 'Serie A',
 				'countryCode' => 'it',
 				'countryName' => 'Italia'
-			  ],
-			  'BSA' => (object) [
+			],
+			'BSA' => (object) [
 				'leagueCode' => 'BSA',
 				'leagueName' => 'Brasileiro Serie A',
 				'countryCode' => 'br',
 				'countryName' => 'Brasil'
-			  ]
-			];
-		}
-		return self::$teams[$code] ?? array_values(self::$teams);
+			]
+		];
+
+		// return the array of teams
+		return $code ? $teams[$code] : array_values($teams);
 	}
 
 	/**
@@ -356,37 +338,19 @@ class Service
 	 * @param String $date
 	 * @return mixed
 	 */
-	private function api($uri, $date = 'Y')
+	private function api($uri)
 	{
-		$data = false;
+		// get the token
+		$token = 'd08dda4df1954b9781e83bd7fedc20c3';
 
-		// load from cache if exists
-		$cache = TEMP_PATH . 'cache/' . date($date) . "_" . md5($uri) . ".tmp";
-		if (file_exists($cache) && false) {
-			$data = unserialize(file_get_contents($cache));
+		// access the api
+		try {
+			$data = Crawler::getCache($uri, 'GET', null, ["X-Auth-Token: $token"]);
+		} catch (Exception $e) {
+			return false;
 		}
-
-		// get from the internet
-		else {
-			// get the token
-			$token = 'd08dda4df1954b9781e83bd7fedc20c3';
-
-			// access the api
-			try {
-				$data = Crawler::get($uri, 'GET', null, ["X-Auth-Token: $token"]);
-			} catch (Exception $e) {
-				return false;
-			}
-
-			$data = json_decode($data);
-
-			// save cache file
-			file_put_contents($cache, serialize($data));
-		}
-
-		Core::log("$uri: ".substr(json_encode($data),0,100), "futbol");
 
 		// return data
-		return $data;
+		return json_decode($data);
 	}
 }

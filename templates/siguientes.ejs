@@ -1,15 +1,6 @@
-<div style="background-image: url('{{APP_SERVICE_PATH}}/images/<%= league.leagueCode %>.png')" class="bg"></div>
-
 <div class="row">
-	<div class="col s4">
-		<img class="league-seal" src="{{APP_SERVICE_PATH}}/images/<%= league.leagueCode %>.png">
-	</div>
-	<div class="col s8">
-		<h1><%= league.leagueName %></h1>
-		<% if(league.countryCode) { %>
-			<img class="flag" src="{{APP_RESOURCES}}/images/flags/<%= league.countryCode %>.png"/>
-		<% } %>
-		<%= league.countryName %>
+	<div class="col s12 center-align">
+		<img src="{{APP_SERVICE_PATH}}/images/<%= league.leagueCode %>.jpg">
 	</div>
 </div>
 
@@ -17,7 +8,7 @@
 	<div class="col s12">
 		<ul class="tabs tabs-fixed-width">
 			<li class="tab"><a href="#" onclick="apretaste.send({command:'FUTBOL RESULTADOS', data:{id:'<%= league.leagueCode %>'}})">Resultados</a></li>
-			<li class="tab disabled"><a class="active" href="#">Próximos</a></li> 
+			<li class="tab"><a class="active" href="#">Próximos</a></li> 
 			<li class="tab"><a href="#" onclick="apretaste.send({command:'FUTBOL MARCADOR', data:{id:'<%= league.leagueCode %>'}})">Marcador</a></li>
 		</ul>
 	</div>
@@ -25,24 +16,28 @@
 
 <div class="row">
 	<div class="col s12">
-		<table class="table striped centered">
-			<thead>
-				<tr>
-					<th>Fecha</th>
-					<th>Local</th>
-					<th>Visitante</th>
-				</tr>
-			</thead>
-			<tbody>
-				<% for(var i=0; i< matches.length; i++) { var match = matches[i]; %>
-				<tr>
-					<td><%= match.date %><br><%= match.time %></td>
-					<td><a href="#!" onclick="apretaste.send({command:'FUTBOL EQUIPO', data:{id:'<%= match.homeId %>'}})"><%= match.homeName %></a></td>
-					<td><a href="#!" onclick="apretaste.send({command:'FUTBOL EQUIPO', data:{id:'<%= match.awayId %>'}})"><%= match.awayName %></a></td>
-				</tr>
-				<% } %>
-			</tbody>
-		</table>
+		<% if(matches.length) { %>
+			<table class="table striped centered">
+				<thead>
+					<tr>
+						<th>Fecha</th>
+						<th>Local</th>
+						<th>Visitante</th>
+					</tr>
+				</thead>
+				<tbody>
+					<% matches.forEach(function(match) { %>
+						<tr>
+							<td><%= match.date %><br><%= match.time %></td>
+							<td><a href="#!" onclick="apretaste.send({command:'FUTBOL EQUIPO', data:{id:'<%= match.homeId %>'}})"><%= match.homeName %></a></td>
+							<td><a href="#!" onclick="apretaste.send({command:'FUTBOL EQUIPO', data:{id:'<%= match.awayId %>'}})"><%= match.awayName %></a></td>
+						</tr>
+					<% }) %>
+				</tbody>
+			</table>
+		<% } else { %>
+			<p class="middle-center grey-text center-align">No encontramos ningún juego futuro. ¿Quizás la liga aún no ha empezado? Revise nuevamente en los próximos días.</p>
+		<% } %>
 	</div>
 </div>
 

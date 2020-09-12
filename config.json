@@ -1,6 +1,7 @@
 {
 	"name": "futbol",
-	"caption": "Futbol",
+	"caption": "Fútbol",
+	"icon": "fas fa-futbol",
 	"description": "Muestra los resultados de los torneos más importantes de futbol",
 	"category": "ocio",
 	"creator": "kumahacker@gmail.com",

@@ -1,44 +1,78 @@
+/* FLAGS */
+
 .flag {
 	width: 20px;
 	height: 11px;
 }
 
+/* FLOAT BUTTON */
+
 .bottom-space {
 	margin-bottom: 80px;
 }
 
-.bg {
-	height: 100%;
-	width: 100%;
-	z-index: -1000;
-	position: fixed;
-	top: 0px;
-	left: 0px;
-	opacity: 0.1;
-	background-repeat: no-repeat;
-	background-position: center center;
+.btn-floating.second {
+	margin-right: -10px;
+	width: 45px;
+	height: 45px;
+	line-height: 58px;
 }
 
-.card-image img {
-	width: 100px;
-	height: 100px;
-	margin: 20px;
+/* CARDS */
+
+.card .fixed-height {
+	height: 130px;
 }
 
-.left {
-	text-align: left !important;
+.card .image {
+	width: 80px;
+	margin-right: 15px;
 }
 
-.league-seal {
-	width: 100%;
-	margin-top: 30px;
+/* ONE LINE COLLECTION */
+
+.collection.one-line .avatar {
+	min-height: 63px;
 }
 
-.head {
-	font-weight: bold;
-	text-align: center;
+/* TAGS */
+
+.chip .icon {
+	float: left;
+	font-size: 16px;
+	line-height: 32px;
+	padding-right: 5px;
 }
 
-ul.tabs {
+.chip.tiny {
+	height: 20px;
+	padding: 0 10px;
+	line-height: 20px;
+	font-size: x-small;
+}
+
+.chip.medium {
+	height: 20px;
+	line-height: 1.5;
+}
+
+.chip.tiny .icon {
+	line-height: 20px;
+}
+
+.chip.clear {
+	color: rgba(0,0,0,0.87);
+	margin: 0px;
+	padding: 0px;
 	background-color: transparent;
+}
+
+.chip.spacing {
+	margin-right: 5px;
+}
+
+/* MESSAGES */
+
+.middle-center {
+	padding: 30px 40px 0px 40px;
 }
