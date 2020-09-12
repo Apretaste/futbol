@@ -9,30 +9,34 @@
 	</div>
 </div>
 
-<ul class="collection one-line">
-	<% players.forEach(function(item) { %>
-		<li class="collection-item avatar">
-			<% if(item.position == "Referi") { %>
-				<i class="tiny material-icons circle"><i class="fas fa-street-view"></i></i>
-			<% } else { %>
-				<i class="tiny material-icons circle"><i class="fas fa-running"></i></i>
-			<% } %>
-			<span class="title">
-				<% if(item.number) { %>
-					<b>#<%= item.number %></b>
+<% if(players.length) { %>
+	<ul class="collection one-line">
+		<% players.forEach(function(item) { %>
+			<li class="collection-item avatar">
+				<% var icon = (item.position == 'Entrenador') ? 'street-view' : 'running'; %>
+				<i class="tiny material-icons circle"><i class="fas fa-<%= icon %>"></i></i>
+
+				<span class="title spacing">
+					<% if(item.number) { %>
+						<b class="spacing">#<%= item.number %></b>
+					<% } %>
+					<%= item.name %>
+				</span>
+
+				<% if(item.position) { %>
+					<span class="chip tiny"><%= item.position %></span>
 				<% } %>
-				<%= item.name %>
-			</span>
-			<% if(item.position) { %>
-				<span class="chip tiny"><%= item.position %></span>
-			<% } %>
-			<p class="blue-grey-text">
-				<span class="chip medium clear spacing"><i class="fas fa-flag"></i> <%= item.country %></span>
-				<span class="chip medium clear spacing"><i class="fas fa-birthday-cake"></i> <%= item.dob %></span>
-			</p>
-		</li>
-	<% }) %>
-</ul>
+
+				<p>
+					<span class="chip medium clear spacing"><i class="fas fa-globe"></i> <%= item.country %></span>
+					<span class="chip medium clear spacing"><i class="fas fa-birthday-cake"></i> <%= item.dob %></span>
+				</p>
+			</li>
+		<% }) %>
+	</ul>
+<% } else { %>
+	<p class="middle-center grey-text center-align">No tenemos información sobre los jugadores de este equipo. Revisamos que pasó e intentaremos buscar la data. Mientras, puede leer más sobre el equipo en Wikipedia.</p>
+<% } %>
 
 <div class="bottom-space"></div>
 

@@ -8,10 +8,10 @@
 					<img class="image left" src="{{APP_SERVICE_PATH}}/images/<%= item.leagueCode %>.jpg">
 					<span class="card-title"><%= item.leagueName %></span>
 					<p>
-					<% if(item.countryCode) { %>
-						<img class="flag" src="{{APP_RESOURCES}}/images/flags/<%= item.countryCode %>.png"/>
-					<% } %>
-					<%= item.countryName %>
+						<% if(item.countryCode) { %>
+							<img class="flag spacing" src="{{APP_RESOURCES}}/images/flags/<%= item.countryCode %>.png"/>
+						<% } %>
+						<%= item.countryName %>
 					</p>
 				</div>
 				<div class="card-action grey lighten-4">

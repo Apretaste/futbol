@@ -67,8 +67,14 @@
 	background-color: transparent;
 }
 
-.chip.spacing {
-	margin-right: 5px;
+/* MESSAGES */
+
+.spacing {
+	margin-right: 5px !important;
+}
+
+.spacing-top {
+	margin-top: 10px;
 }
 
 /* MESSAGES */
